@@ -59,15 +59,28 @@ function dbRun(query, params) {
 // GET request handler for crime codes
 app.get('/codes', (req, res) => {
     console.log(req.query); // query object (key-value pairs after the ? in the url)
-    
-    res.status(200).type('json').send({}); // <-- you will need to change this
+    let query = "SELECT * FROM CODES";
+    if (req.query.code) {
+        query += " WHERE code IN (" + req.query.code + ")";
+    }
+
+    dbSelect(query).then((result) => {
+        console.log(result);
+        res.status(200).type('json').send({result}); // <-- you will need to change this
+    });
 });
 
 // GET request handler for neighborhoods
 app.get('/neighborhoods', (req, res) => {
     console.log(req.query); // query object (key-value pairs after the ? in the url)
-    
-    res.status(200).type('json').send({}); // <-- you will need to change this
+    let query = "SELECT * FROM NEIGHBORHOODS"
+    if (req.query.id) {
+        query += " WHERE neighborhood_number IN (" + req.query.id + ")";
+    }
+    dbSelect(query).then((result) => {
+        console.log(result);
+        res.status(200).type('json').send({result}); // <-- you will need to change this
+    });
 });
 
 // GET request handler for crime incidents
