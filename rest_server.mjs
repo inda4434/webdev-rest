@@ -156,18 +156,29 @@ app.get('/incidents', (req, res) => {
 // PUT request handler for new crime incident
 app.put('/new-incident', (req, res) => {
     const incidentData = req.body;
-    const combinedDateTime = `${incidentData.date} ${incidentData.time}`;
-    const query = 'INSERT INTO incidents (case_number, date_time, code, incident, police_grid, neighborhood_number, block) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    const params = [incidentData.case_number, combinedDateTime, incidentData.code, incidentData.incident, incidentData.police_grid, incidentData.neighborhood_number, incidentData.block];
+    const queryCheckDuplicate = 'SELECT * FROM incidents WHERE case_number = ?';
+    const paramsCheckDuplicate = [incidentData.case_number];
 
-    dbRun(query, params)
-        .then(() => {
-            res.status(200).type('txt').send('Case inserted successfully');
-        })
-        .catch((err) => {
-            console.error(err);
-            res.status(500).send(err.message);
-        });
+    dbSelect(queryCheckDuplicate, paramsCheckDuplicate)
+    .then((result) => {
+    // Check if case number already exists in database    
+    if (result.length > 0) {
+        res.status(500).send('Case number already exists in database, cannot be inserted');
+    } else {
+        const combinedDateTime = `${incidentData.date} ${incidentData.time}`;
+        const query = 'INSERT INTO incidents (case_number, date_time, code, incident, police_grid, neighborhood_number, block) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        const params = [incidentData.case_number, combinedDateTime, incidentData.code, incidentData.incident, incidentData.police_grid, incidentData.neighborhood_number, incidentData.block];
+
+        dbRun(query, params)
+            .then(() => {
+                res.status(200).type('txt').send('Case inserted successfully');
+            })
+            .catch((err) => {
+                console.error(err);
+                res.status(500).send(err.message);
+            });
+    }
+});
 });
 
 // DELETE request handler for new crime incident
