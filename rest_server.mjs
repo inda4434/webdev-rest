@@ -87,7 +87,70 @@ app.get('/neighborhoods', (req, res) => {
 app.get('/incidents', (req, res) => {
     console.log(req.query); // query object (key-value pairs after the ? in the url)
     
-    res.status(200).type('json').send({}); // <-- you will need to change this
+    let query = 'SELECT case_number, strftime("%Y-%m-%d", date_time) AS date , strftime("%H:%M:%S", date_time) AS time, code, incident, police_grid, neighborhood_number, block FROM Incidents';
+    let i = []; // incidents list
+    let c = []; // count
+
+    // add start_date - first date to include in results
+    if (req.query.hasOwnProperty('start_date')) {
+        query += ' WHERE date_time > "' + req.query.start_date +'" ';
+        c.push('1');
+    }
+    // add end_date - last date to include in results
+    if (req.query.hasOwnProperty('end_date')) {
+        if (c.length === 0) {
+            query += ' WHERE date_time < "' + req.query.end_date +'"';
+        } 
+        else {
+            query += ' AND date_time < "' + req.query.end_date +'"';
+        }
+        c.push('1');
+    }
+    // code - comma separated list of codes
+    if (req.query.hasOwnProperty('code')) {
+        if (c.length === 0) {
+            query += ' WHERE code IN (' + req.query.code +')';
+        } 
+        else {
+            query += ' AND code IN (' + req.query.code +')';
+        }
+        c.push('1');
+    }
+    // grid - comma separated list of grids
+    if (req.query.hasOwnProperty('grid')) {
+        if (c.length === 0) {
+            query += ' WHERE police_grid IN (' + req.query.grid +')';
+        } 
+        else {
+            query += ' AND police_grid IN (' + req.query.grid +')';
+        }
+        c.push('1');
+    }
+    // neighborhood - comma separated list of neighborhood numbers
+    if (req.query.hasOwnProperty('neighborhood')) {
+        if (c.length === 0) {
+            query += ' WHERE neighborhood_number IN (' + req.query.neighborhood +')';
+        } 
+        else {
+            query += ' AND neighborhood_number IN (' + req.query.neighborhood +')';
+        }
+        c.push('1');
+    }
+    // limit - max num of incidents, default 1000
+    if (req.query.hasOwnProperty('limit')) {
+        query += ' ORDER BY date_time DESC LIMIT ' + req.query.limit; 
+    } else {
+        query += ' ORDER BY date_time DESC LIMIT 1000' // default limit
+    }
+
+    console.log(query);
+    dbSelect(query, i)
+    .then ((rows) => {
+        res.status(200).type('json').send(rows);
+    })
+    .catch((error) => {
+        res.status(500).type('txt').send(error);
+    })
 });
 
 // PUT request handler for new crime incident
