@@ -16,7 +16,9 @@
         "email": "carl1484@stthomas.edu"
         }
     ],
-    "repository": {"https://github.com/Bifuh/webdev-rest"},
+    "repository": {
+        "url": "https://github.com/Bifuh/webdev-rest"
+    },
     "dependencies": {
         "express": "^4.18.2",
         "sqlite3": "^5.1.6"
