@@ -92,16 +92,48 @@ app.get('/incidents', (req, res) => {
 
 // PUT request handler for new crime incident
 app.put('/new-incident', (req, res) => {
-    console.log(req.body); // uploaded data
-    
-    res.status(200).type('txt').send('OK'); // <-- you may need to change this
+    const incidentData = req.body;
+    const combinedDateTime = `${incidentData.date} ${incidentData.time}`;
+    const query = 'INSERT INTO incidents (case_number, date_time, code, incident, police_grid, neighborhood_number, block) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    const params = [incidentData.case_number, combinedDateTime, incidentData.code, incidentData.incident, incidentData.police_grid, incidentData.neighborhood_number, incidentData.block];
+
+    dbRun(query, params)
+        .then(() => {
+            res.status(200).type('txt').send('Case inserted successfully');
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send(err.message);
+        });
 });
 
 // DELETE request handler for new crime incident
 app.delete('/remove-incident', (req, res) => {
-    console.log(req.body); // uploaded data
-    
-    res.status(200).type('txt').send('OK'); // <-- you may need to change this
+    const caseNumber = req.body.case_number;
+
+    // Check if the case number exists
+    dbSelect('SELECT * FROM incidents WHERE case_number = ?', [caseNumber])
+    .then((rows) => {
+        if (rows.length === 0) {
+            // Case number does not exist, reject with status 500
+            res.status(500).type('txt').send('Case number does not exist in the database');
+        } else {
+            // Case number exists, remove incident
+            dbRun('DELETE FROM incidents WHERE case_number = ?', [caseNumber])
+            .then(() => {
+                console.log('Data deleted successfully');
+                res.status(200).type('txt').send('Case deleted successfully');
+            })
+            .catch((err) => {
+                console.error('Error deleting data:', err);
+                res.status(500).type('txt').send('Internal Server Error: ' + err.message);
+            });
+        }
+    })
+    .catch((err) => {
+        console.error('Error checking case number:', err);
+        res.status(500).type('txt').send('Internal Server Error: ' + err.message);
+    });
 });
 
 /********************************************************************
