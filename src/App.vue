@@ -48,6 +48,9 @@ onMounted(() => {
         maxZoom: 18
     }).addTo(map.leaflet);
     map.leaflet.setMaxBounds([[44.883658, -93.217977], [45.008206, -92.993787]]);
+    
+
+    map.leaflet.on('moveend', onMapMoveEnd);
 
     // Get boundaries for St. Paul neighborhoods
     let district_boundary = new L.geoJson();
@@ -67,7 +70,56 @@ onMounted(() => {
 });
 
 
+
+
 // FUNCTIONS
+function onMapMoveEnd(e) {
+    let url_input = document.getElementById('dialog-url');
+    let center = e.target.getCenter();
+    url_input.value = "(" + center.lat + ", " + center.lng + ")";
+}
+
+function updateMapLocation(input) {
+    let up = new Promise((resolve, reject) => {
+        if (input[0] == '(' && input[input.length - 1] == ')') {
+        let coords = input.split(",");
+        let lat = parseFloat(coords[0].replace("(", "").replace(" ", ""));
+        let lon = parseFloat(coords[1].replace(")", ""));
+        
+        if (isNaN(lat) || isNaN(lon)) {
+            reject();
+        }
+
+        resolve({lat, lon});
+    } else {
+        fetch('https://nominatim.openstreetmap.org/search?q=' + crime_url.value + '&format=json&limit=1').then((res) => {
+        res.json().then((data) => {
+            let lat = console.log(data[0].lat);
+            let lon = console.log(data[0].lon);
+
+            if (typeof(lat) === 'undefined') {
+                reject();
+            }
+            resolve({lat, lon});
+            });
+        });
+    }});
+
+    up.then((data) => {
+        let lat = data.lat;
+        let lon = data.lon;
+
+        lat = Math.min(map.bounds.nw.lat, lat);
+        lat = Math.max(map.bounds.se.lat, lat);
+        lon = Math.max(map.bounds.nw.lng, lon);
+        lon = Math.min(map.bounds.se.lng, lon);
+
+        map.leaflet.flyTo(new L.LatLng(lat, lon));
+
+        console.log(lat, lon, 8);
+    })
+}
+
 // Function called once user has entered REST API URL
 function initializeCrimes() {
     // TODO: get code and neighborhood data
@@ -78,12 +130,12 @@ function initializeCrimes() {
 function closeDialog() {
     let dialog = document.getElementById('rest-dialog');
     let url_input = document.getElementById('dialog-url');
-    if (crime_url.value !== '' && url_input.checkValidity()) {
+    updateMapLocation(url_input.value);
+    if (crime_url.value != '' && url_input.checkValidity()) {
         dialog_err.value = false;
         dialog.close();
         initializeCrimes();
-    }
-    else {
+    } else {
         dialog_err.value = true;
     }
 }
@@ -93,7 +145,7 @@ function closeDialog() {
     <dialog id="rest-dialog" open>
         <h1 class="dialog-header">St. Paul Crime REST API</h1>
         <label class="dialog-label">URL: </label>
-        <input id="dialog-url" class="dialog-input" type="url" v-model="crime_url" placeholder="http://localhost:8000" />
+        <input id="dialog-url" class="dialog-input" type="url" v-model="crime_url" placeholder="http://localhost:8000"/>
         <p class="dialog-error" v-if="dialog_err">Error: must enter valid URL</p>
         <br/>
         <button class="button" type="button" @click="closeDialog">OK</button>
