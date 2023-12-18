@@ -95,10 +95,10 @@ function updateMapLocation() {
 
         resolve({lat, lon});
     } else {
-        fetch('https://nominatim.openstreetmap.org/search?q=' + input + '&format=json&limit=1').then((res) => {
+        fetch('https://nominatim.openstreetmap.org/search?q=' + input + '&format=json&limit=1').then((res) => {https://www.youtube.com/watch?v=WWUUN4Xxvm4
         res.json().then((data) => {
-            let lat = console.log(data[0].lat);
-            let lon = console.log(data[0].lon);
+            let lat = data[0].lat;
+            let lon = data[0].lon;
 
             if (typeof(lat) === 'undefined') {
                 reject();
@@ -117,9 +117,9 @@ function updateMapLocation() {
         lon = Math.max(map.bounds.nw.lng, lon);
         lon = Math.min(map.bounds.se.lng, lon);
 
-        map.leaflet.flyTo(new L.LatLng(lat, lon));
+        map.leaflet.flyTo(new L.LatLng(lat, lon), 18);
 
-        console.log(lat, lon, 8);
+        console.log(lat, lon);
     })
 }
 
