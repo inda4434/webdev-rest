@@ -124,60 +124,6 @@ function updateMapLocation() {
         console.log(lat, lon);
     })
 }
-/*
-// Function called once user has entered REST API URL
-function initializeCrimes() {
-    fetch(crime_url.value + '/incidents?limit=10')
-    .then(response => response.json())
-    .then(data => {
-        crimes.value = data;
-        console.log(crimes.value);
-    })
-    .catch(error => {
-        console.error('Error fetching data:', error);
-    });
-}
-
-// Function to get neighborhood name
-function getNeighborhoodName(id) {
-    fetch(crime_url.value + '/neighborhoods?id=' + id)
-    .then(response => response.json())
-    .then((data) => {
-        console.log(data[0].neighborhood_name);
-        return data[0].neighborhood_name;
-    }).catch((err) => {
-        console.log("Error: " + err);
-    });
-}
-
-// Set neighborhood names
-function initializeNeighborhoods() {
-    crimes.value.forEach(crime => {
-        getNeighborhoodName(crime.neighborhood_number)
-            .then(name => crime.neighborhood_name = name);
-    });
-}
-
-// Function to get incident type
-function getIncidentType(code) {
-    fetch(crime_url.value + '/codes?code=' + code)
-    .then(response => response.json())
-    .then((data) => {
-        console.log(data[0].incident_type)
-        return data[0].incident_type;
-    }).catch((err) => {
-        console.log("Error: " + err);
-    });
-}
-
-// Set incident types
-function initializeTypes() {
-    crimes.value.forEach(crime => {
-        getIncidentType(crime.code)
-            .then(type => crime.incident_type = type);
-    });
-}
-*/
 
 // Function to fetch neighborhood name for a single crime
 function fetchNeighborhoodNameForCrime(crime) {
@@ -207,29 +153,24 @@ function fetchIncidentTypeForCrime(crime) {
 
 // Function called once user has entered REST API URL
 function initializeCrimes() {
-    fetch(crime_url.value + '/incidents?limit=15')
+    fetch(crime_url.value + '/incidents')
         .then(response => response.json())
         .then(data => {
             crimes.value = data;
             console.log(crimes.value);
 
-            // Fetch neighborhood names and incident types for each crime
             const fetchNeighborhoodPromises = crimes.value.map(crime => fetchNeighborhoodNameForCrime(crime));
             const fetchIncidentTypePromises = crimes.value.map(crime => fetchIncidentTypeForCrime(crime));
 
-            // Wait for all fetches to complete before rendering
             Promise.all([...fetchNeighborhoodPromises, ...fetchIncidentTypePromises])
                 .then(() => {
-                    // Now crimes have neighborhood names and incident types attached
                     console.log(crimes.value);
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
+                    addMarkersToMap();
         })
         .catch(error => {
             console.error('Error fetching data:', error);
         });
+});
 }
 
 
@@ -246,6 +187,64 @@ function closeDialog() {
         dialog_err.value = true;
     }
 }
+
+/// Function to get crime counts for each neighborhood
+function calculateCrimeCounts() {
+    const neighborhoodCounts = {};
+
+    crimes.value.forEach((crime) => {
+        const neighborhoodName = crime.neighborhood_name || 'Unknown Neighborhood';
+
+        if (!neighborhoodCounts[neighborhoodName]) {
+            neighborhoodCounts[neighborhoodName] = 1;
+        } else {
+            neighborhoodCounts[neighborhoodName]++;
+        }
+    });
+
+    return neighborhoodCounts;
+}
+
+// Function to add markers to the map
+function addMarkersToMap() {
+    const neighborhoodCounts = calculateCrimeCounts();
+
+    for (const [neighborhoodName, crimeCount] of Object.entries(neighborhoodCounts)) {
+        getCoordinatesForNeighborhood(neighborhoodName).then((coordinates) => {
+            const marker = L.marker(coordinates).addTo(map.leaflet);
+            marker.bindPopup(`Neighborhood: ${neighborhoodName}<br>Crime Count: ${crimeCount}`);
+        });
+    }
+}
+
+// Function to get coordinates for a neighborhood using Nominatim API
+async function getCoordinatesForNeighborhood(neighborhoodName) {
+    const nominatimApiUrl = 'https://nominatim.openstreetmap.org/search';
+    const params = {
+        q: neighborhoodName,
+        format: 'json',
+    };
+
+    try {
+        const response = await fetch(`${nominatimApiUrl}?${new URLSearchParams(params)}`);
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+            return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+        }
+    } catch (error) {
+        console.error('Error fetching coordinates:', error);
+    }
+
+    return [0, 0];
+}
+
+onMounted(async () => {
+    await initializeCrimes();
+    await new Promise(resolve => map.leaflet.whenReady(resolve));
+    addMarkersToMap();
+});
+
 
 const newIncident = ref({
     case_number: '',
@@ -317,21 +316,21 @@ function newIncidentFunc(){
         <table>
             <thead>
                 <tr>
-                    <th>Incident</th>
+                    <th>Incident Type</th>
                     <th>Date</th>
                     <th>Time</th>
-                    <th>Incident Type</th>
                     <th>Neighborhood Name</th>
+                    <th>Block</th>
                     <!--<th>Police Grid</th>-->
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="crime in crimes" :key="crime.case_number">
-                    <td>{{ crime.incident }}</td>
+                <tr v-for="crime in crimes.slice(0, 50)" :key="crime.case_number">
+                    <td>{{ crime.incident_type }}</td>
                     <td>{{ crime.date }}</td>
                     <td>{{ crime.time }}</td>
-                    <td>{{ crime.incident_type }}</td>
                     <td>{{ crime.neighborhood_name }}</td>
+                    <td>{{ crime.block }}</td>
 
                     <!--<td>{{ crime.police_grid }}</td>-->
                 </tr>
