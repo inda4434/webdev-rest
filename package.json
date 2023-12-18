@@ -8,12 +8,12 @@
     },
     "contributors": [
         {
-        "name": "Gratzia Indacochea",
-        "email": "inda4434@stthomas.edu"
+            "name": "Gratzia Indacochea",
+            "email": "inda4434@stthomas.edu"
         },
         {
-        "name": "Chandler Carlin",
-        "email": "carl1484@stthomas.edu"
+            "name": "Chandler Carlin",
+            "email": "carl1484@stthomas.edu"
         }
     ],
     "repository": {
@@ -25,6 +25,7 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "cors": "^2.8.5",
         "express": "^4.18.2",
         "sqlite3": "^5.1.6",
         "vue": "^3.3.4"

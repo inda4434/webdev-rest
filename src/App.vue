@@ -1,9 +1,11 @@
 <script setup>
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted } from 'vue';
+
 
 let crime_url = ref('');
 let location_input = ref('');
 let dialog_err = ref(false);
+let crimes = ref([]);
 let map = reactive(
     {
         leaflet: null,
@@ -95,7 +97,7 @@ function updateMapLocation() {
 
         resolve({lat, lon});
     } else {
-        fetch('https://nominatim.openstreetmap.org/search?q=' + input + '&format=json&limit=1').then((res) => {https://www.youtube.com/watch?v=WWUUN4Xxvm4
+        fetch('https://nominatim.openstreetmap.org/search?q=' + input + '&format=json&limit=1').then((res) => {
         res.json().then((data) => {
             let lat = data[0].lat;
             let lon = data[0].lon;
@@ -122,18 +124,120 @@ function updateMapLocation() {
         console.log(lat, lon);
     })
 }
+/*
+// Function called once user has entered REST API URL
+function initializeCrimes() {
+    fetch(crime_url.value + '/incidents?limit=10')
+    .then(response => response.json())
+    .then(data => {
+        crimes.value = data;
+        console.log(crimes.value);
+    })
+    .catch(error => {
+        console.error('Error fetching data:', error);
+    });
+}
+
+// Function to get neighborhood name
+function getNeighborhoodName(id) {
+    fetch(crime_url.value + '/neighborhoods?id=' + id)
+    .then(response => response.json())
+    .then((data) => {
+        console.log(data[0].neighborhood_name);
+        return data[0].neighborhood_name;
+    }).catch((err) => {
+        console.log("Error: " + err);
+    });
+}
+
+// Set neighborhood names
+function initializeNeighborhoods() {
+    crimes.value.forEach(crime => {
+        getNeighborhoodName(crime.neighborhood_number)
+            .then(name => crime.neighborhood_name = name);
+    });
+}
+
+// Function to get incident type
+function getIncidentType(code) {
+    fetch(crime_url.value + '/codes?code=' + code)
+    .then(response => response.json())
+    .then((data) => {
+        console.log(data[0].incident_type)
+        return data[0].incident_type;
+    }).catch((err) => {
+        console.log("Error: " + err);
+    });
+}
+
+// Set incident types
+function initializeTypes() {
+    crimes.value.forEach(crime => {
+        getIncidentType(crime.code)
+            .then(type => crime.incident_type = type);
+    });
+}
+*/
+
+// Function to fetch neighborhood name for a single crime
+function fetchNeighborhoodNameForCrime(crime) {
+    return fetch(crime_url.value + '/neighborhoods?id=' + crime.neighborhood_number)
+        .then(response => response.json())
+        .then((data) => {
+            crime.neighborhood_name = data[0] ? data[0].neighborhood_name : 'Unknown Neighborhood';
+        })
+        .catch((err) => {
+            console.log("Error fetching neighborhood name: " + err);
+            crime.neighborhood_name = 'Unknown Neighborhood';
+        });
+}
+
+// Function to fetch incident type for a single crime
+function fetchIncidentTypeForCrime(crime) {
+    return fetch(crime_url.value + '/codes?code=' + crime.code)
+        .then(response => response.json())
+        .then((data) => {
+            crime.incident_type = data[0] ? data[0].incident_type : 'Unknown Incident Type';
+        })
+        .catch((err) => {
+            console.log("Error fetching incident type: " + err);
+            crime.incident_type = 'Unknown Incident Type';
+        });
+}
 
 // Function called once user has entered REST API URL
 function initializeCrimes() {
-    // TODO: get code and neighborhood data
-    //       get initial 1000 crimes
+    fetch(crime_url.value + '/incidents?limit=15')
+        .then(response => response.json())
+        .then(data => {
+            crimes.value = data;
+            console.log(crimes.value);
+
+            // Fetch neighborhood names and incident types for each crime
+            const fetchNeighborhoodPromises = crimes.value.map(crime => fetchNeighborhoodNameForCrime(crime));
+            const fetchIncidentTypePromises = crimes.value.map(crime => fetchIncidentTypeForCrime(crime));
+
+            // Wait for all fetches to complete before rendering
+            Promise.all([...fetchNeighborhoodPromises, ...fetchIncidentTypePromises])
+                .then(() => {
+                    // Now crimes have neighborhood names and incident types attached
+                    console.log(crimes.value);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
 }
+
 
 // Function called when user presses 'OK' on dialog box
 function closeDialog() {
     let dialog = document.getElementById('rest-dialog');
     let url_input = document.getElementById('dialog-url');
-    updateMapLocation(url_input.value);
+    //updateMapLocation(url_input.value);
     if (crime_url.value != '' && url_input.checkValidity()) {
         dialog_err.value = false;
         dialog.close();
@@ -205,11 +309,38 @@ function newIncidentFunc(){
 
     <dialog id="location-dialog" open>
         <label class="location-label">Location: </label>
-        <input id="location" class="dialog-input" type="text" v-model="location_input" placeholder="http://localhost:8000"/>
+        <input id="location" class="dialog-input" type="text" v-model="location_input" placeholder="Enter location"/>
         <br/>
         <button class="button" type="button" @click="updateMapLocation">Go</button>
     </dialog>
+    <div v-if="crimes.length > 0" class="grid-x grid-padding-x">
+        <table>
+            <thead>
+                <tr>
+                    <th>Incident</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Incident Type</th>
+                    <th>Neighborhood Name</th>
+                    <!--<th>Police Grid</th>-->
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="crime in crimes" :key="crime.case_number">
+                    <td>{{ crime.incident }}</td>
+                    <td>{{ crime.date }}</td>
+                    <td>{{ crime.time }}</td>
+                    <td>{{ crime.incident_type }}</td>
+                    <td>{{ crime.neighborhood_name }}</td>
 
+                    <!--<td>{{ crime.police_grid }}</td>-->
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div v-else>
+      <p>Enter API URL to view crime data</p>
+    </div>
     
     <!--NEW INCIDENT FORM-->
     <div>
