@@ -5,7 +5,9 @@ import { default as express } from 'express';
 import { default as sqlite3 } from 'sqlite3';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-const db_filename = path.join(__dirname, 'db', 'stpaul_crime.sqlite3');
+const db_filename = path.join(__dirname, '../db', 'stpaul_crime.sqlite3');
+
+console.log(db_filename);
 
 const port = 8000;
 
