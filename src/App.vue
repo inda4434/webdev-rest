@@ -152,7 +152,7 @@ const newIncident = ref({
 });
 
 function newIncident(){
-    fetch('http:localhost:8000/new-incident', {
+    fetch(`${crime_url.value}/new-incident`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
