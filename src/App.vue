@@ -139,6 +139,49 @@ function closeDialog() {
         dialog_err.value = true;
     }
 }
+
+const newIncident = ref({
+    case_number: '',
+    date: '',
+    time: '',
+    code: '',
+    incident: '',
+    police_grid: '',
+    neighborhood_number: '',
+    block: ''
+});
+
+function newIncident(){
+    fetch('http:localhost:8000/new-incident', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newIncident.value),
+    })
+    .then (response => {
+        if (response.ok){
+            console.log('new form added');
+            newIncident.value = {
+                case_number: '',
+                date: '',
+                time: '',
+                code: '',
+                incident: '',
+                police_grid: '',
+                neighborhood_number: '',
+                block: ''
+            };
+        }
+        else {
+            console.log('sucks');
+        }
+    })
+    .catch(err =>{
+        console.log(err)
+    });
+}
+
 </script>
 
 <template>
@@ -153,6 +196,62 @@ function closeDialog() {
     <div class="grid-container ">
         <div class="grid-x grid-padding-x">
             <div id="leafletmap" class="cell auto"></div>
+        </div>
+    </div>
+
+
+    <!--NEW INCIDENT FORM-->
+    <div>
+        <div class="grid-x grid-padding-x">
+            <h3>New Incident Form</h3>
+            <div class="cell small-12 large-12">
+                <form id="new-incident" action="/new-incident" method="PUT" @submit.prevent="newIncident">
+                    <!--case_number-->
+                    <div class="cell small-12 large-6">
+                        <label for="case_number">Case Number: </label>
+                        <input type="text" placeholder="Ex: 20231219" name="case_number" id="case_number" v-model="newIncident.case_number" required/>
+                    </div>
+                    <!--date-->
+                    <div class="cell small-12 large-6">
+                        <label for="date">Date: </label>
+                        <input type="text" placeholder="Ex: 2023-12-19" name="date" id="date" v-model="newIncident.date" required/>
+                    </div>
+                    <!--time-->
+                    <div class="cell small-12 large-6">
+                        <label for="time">Time: </label>
+                        <input type="text" placeholder="Ex: 21:59:59" name="time" id="time" v-model="newIncident.time" required/>
+                    </div>
+                    <!--code-->
+                    <div class="cell small-12 large-6">
+                        <label for="code">Code: </label>
+                        <input type="text" placeholder="Ex: 9954" name="code" id="code" v-model="newIncident.code" required/>
+                    </div>
+                    <!--incident-->
+                    <div class="cell small-12 large-6">
+                        <label for="incident">Incident: </label>
+                        <input type="text" placeholder="Ex: Proactive Police Visit" name="incident" id="incident" v-model="newIncident.incident" required/>
+                    </div>
+                    <!--police_grid-->
+                    <div class="cell small-12 large-6">
+                        <label for="police_grid">Police Grid: </label>
+                        <input type="text" placeholder="Ex: 87" name="police_grid" id="police_grid" v-model="newIncident.police_grid" required/>
+                    </div>
+                    <!--neighborhood_number-->
+                    <div class="cell small-12 large-6">
+                        <label for="neighborhood_number">Neighborhood Number: </label>
+                        <input type="text" placeholder="Ex: 7" name="neighborhood_number" id="neighborhood_number" v-model="newIncident.neighborhood_number" required/>
+                    </div>
+                    <!--block-->
+                    <div class="cell small-12 large-6">
+                        <label for="block">Block: </label>
+                        <input type="text" placeholder="Ex: 98X UNIVERSITY AV W" name="block" id="block" v-model="newIncident.block" required/>
+                    </div>
+                    <!--submit-->
+                    <div class="cell small-12 large-6">
+                        <button id="sub_new_inc" type="submit">Submit</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </template>
