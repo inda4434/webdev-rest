@@ -2,6 +2,7 @@
 import { reactive, ref, onMounted } from 'vue'
 
 let crime_url = ref('');
+let location_input = ref('');
 let dialog_err = ref(false);
 let map = reactive(
     {
@@ -74,12 +75,14 @@ onMounted(() => {
 
 // FUNCTIONS
 function onMapMoveEnd(e) {
-    let url_input = document.getElementById('dialog-url');
+    let input = document.getElementById('location');
     let center = e.target.getCenter();
-    url_input.value = "(" + center.lat + ", " + center.lng + ")";
+    input.value = "(" + center.lat + ", " + center.lng + ")";
 }
 
-function updateMapLocation(input) {
+function updateMapLocation() {
+    let input = document.getElementById('location').value;
+    console.log(input);
     let up = new Promise((resolve, reject) => {
         if (input[0] == '(' && input[input.length - 1] == ')') {
         let coords = input.split(",");
@@ -92,7 +95,7 @@ function updateMapLocation(input) {
 
         resolve({lat, lon});
     } else {
-        fetch('https://nominatim.openstreetmap.org/search?q=' + crime_url.value + '&format=json&limit=1').then((res) => {
+        fetch('https://nominatim.openstreetmap.org/search?q=' + input + '&format=json&limit=1').then((res) => {
         res.json().then((data) => {
             let lat = console.log(data[0].lat);
             let lon = console.log(data[0].lon);
@@ -151,18 +154,18 @@ const newIncident = ref({
     block: ''
 });
 
-function newIncident(){
+function newIncidentFunc(){
     fetch(`${crime_url.value}/new-incident`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newIncident.value),
+        body: JSON.stringify(newIncidentFunc.value),
     })
     .then (response => {
         if (response.ok){
             console.log('new form added');
-            newIncident.value = {
+            newIncidentFunc.value = {
                 case_number: '',
                 date: '',
                 time: '',
@@ -193,13 +196,21 @@ function newIncident(){
         <br/>
         <button class="button" type="button" @click="closeDialog">OK</button>
     </dialog>
+
     <div class="grid-container ">
         <div class="grid-x grid-padding-x">
             <div id="leafletmap" class="cell auto"></div>
         </div>
     </div>
 
+    <dialog id="location-dialog" open>
+        <label class="location-label">Location: </label>
+        <input id="location" class="dialog-input" type="text" v-model="location_input" placeholder="http://localhost:8000"/>
+        <br/>
+        <button class="button" type="button" @click="updateMapLocation">Go</button>
+    </dialog>
 
+    
     <!--NEW INCIDENT FORM-->
     <div>
         <div class="grid-x grid-padding-x">
