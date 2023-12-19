@@ -315,6 +315,32 @@ function deleteCrime(caseNumber) {
     });
 }
 
+function getCrimeCategory(code) {
+    const codeNumber = parseInt(code);
+
+    // Checking numerical ranges for each category
+    if ((codeNumber >= 100 && codeNumber <= 299) || (codeNumber >= 800 && codeNumber <= 899) || (codeNumber >= 400 && codeNumber <= 499) || (codeNumber >= 300 && codeNumber <= 399)) {
+        return 'violent-crime';
+    } else if ((codeNumber >= 900 && codeNumber <= 999) || (codeNumber >= 500 && codeNumber <= 699) || (codeNumber >= 600 && codeNumber <= 699) || (codeNumber >= 700 && codeNumber <= 799) || (codeNumber >= 1400 && codeNumber <= 1499)) {
+        return 'property-crime';
+    } else if ((codeNumber >= 1800 && codeNumber <= 1899)) {
+        return 'drug-crime';
+    }else {
+        console.log("other crime");
+        return 'other-crime';
+    }
+}
+
+/*
+function getCrimeCategoryClass(crime) {
+        const category = getCrimeCategory(crime);
+        return {
+            'violent-crime': category === 'Violent Crime',
+            'property-crime': category === 'Property Crime',
+            'other-crime': category === 'Other Crime',
+        };
+    }
+*/
 //sick and twisted
 let checkedIncidents = ref([]);
 let checkedNeighborhoods = ref([]);
@@ -589,7 +615,7 @@ function newIncidentFunc(){
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="crime in crimes.slice(0, 5)" :key="crime.case_number">
+                <tr v-for="crime in crimes.slice(0, 15)" :key="crime.case_number" :class=getCrimeCategory(crime.code)>
                     <td>{{ crime.incident }}</td>
                     <td>{{ crime.date }}</td>
                     <td>{{ crime.time }}</td>
@@ -610,6 +636,25 @@ function newIncidentFunc(){
     </div>
     <div v-else>
       <p>No crime data to show</p>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color violent-crime"></div>
+            <div class="legend-label">Violent Crime</div>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color property-crime"></div>
+            <div class="legend-label">Property Crime</div>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color drug-crime"></div>
+            <div class="legend-label">Drug Crime</div>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color other-crime"></div>
+            <div class="legend-label">Other Crime</div>
+        </div>
     </div>
     
     <!--NEW INCIDENT FORM-->
@@ -712,7 +757,7 @@ function newIncidentFunc(){
 }
 
 #details-button, #filter-button, #delete-button {
-    background-color: #a0b8d2;
+    background-color: #b8eef7;
     color: #000000;
     padding: 8px 16px;
     border: none;
@@ -721,7 +766,7 @@ function newIncidentFunc(){
 }
 
 #details-button:hover, #filter-button:hover, #delete-button:hover {
-    background-color: #427bb8; /* Change background color on hover */
+    background-color: #a9caed; /* Change background color on hover */
 }
 
 #filter-button {
@@ -734,5 +779,38 @@ function newIncidentFunc(){
     width: 12px;
     height: 12px;
 }
+
+.violent-crime {
+    background-color: #f1c2c2; /* Red background for violent crimes */
+}
+
+.property-crime {
+    background-color: #f4d3a2; /* Orange background for property crimes */
+}
+
+.drug-crime {
+    background-color: #efebb9; /* Yellow background for drug crimes */
+}
+
+.other-crime {
+    background-color: #dadad8; /* Grey background for other crimes */
+}
+.legend {
+    display: flex;
+    margin-top: 10px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
 
 </style>
