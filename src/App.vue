@@ -300,18 +300,17 @@ function newIncidentFunc(){
         <button class="button" type="button" @click="closeDialog">OK</button>
     </dialog>
 
-    <div class="grid-container ">
+    <div class="grid-container">
         <div class="grid-x grid-padding-x">
             <div id="leafletmap" class="cell auto"></div>
         </div>
     </div>
 
     <dialog id="location-dialog" open>
-        <label class="location-label">Location: </label>
         <input id="location" class="dialog-input" type="text" v-model="location_input" placeholder="Enter location"/>
-        <br/>
-        <button class="button" type="button" @click="updateMapLocation">Go</button>
+        <button id="go-button" class="button" type="button" @click="updateMapLocation">Go</button>
     </dialog>
+
     <div v-if="crimes.length > 0" class="grid-x grid-padding-x">
         <table>
             <thead>
@@ -426,4 +425,14 @@ function newIncidentFunc(){
     font-size: 1rem;
     color: #D32323;
 }
+
+#location-dialog {
+    height:7rem;
+    width: 24rem;
+}
+
+#go-button {
+    font-size: x-small;
+}
+
 </style>
