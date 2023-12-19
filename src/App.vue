@@ -51,8 +51,6 @@ onMounted(() => {
         maxZoom: 18
     }).addTo(map.leaflet);
     map.leaflet.setMaxBounds([[44.883658, -93.217977], [45.008206, -92.993787]]);
-    
-
     map.leaflet.on('moveend', onMapMoveEnd);
 
     // Get boundaries for St. Paul neighborhoods
@@ -183,6 +181,10 @@ function closeDialog() {
         dialog_err.value = false;
         dialog.close();
         initializeCrimes();
+
+        let loc = document.getElementById('location-dialog');
+        loc.removeAttribute('hidden');
+
     } else {
         dialog_err.value = true;
     }
@@ -300,16 +302,18 @@ function newIncidentFunc(){
         <button class="button" type="button" @click="closeDialog">OK</button>
     </dialog>
 
+    <dialog id="location-dialog" hidden open>
+        <input id="location" class="dialog-input" type="text" v-model="location_input" placeholder="Enter location"/>
+        <button id="go-button" class="button" type="button" @click="updateMapLocation">Go</button>
+    </dialog>
+
     <div class="grid-container">
         <div class="grid-x grid-padding-x">
             <div id="leafletmap" class="cell auto"></div>
         </div>
     </div>
 
-    <dialog id="location-dialog" open>
-        <input id="location" class="dialog-input" type="text" v-model="location_input" placeholder="Enter location"/>
-        <button id="go-button" class="button" type="button" @click="updateMapLocation">Go</button>
-    </dialog>
+
 
     <div v-if="crimes.length > 0" class="grid-x grid-padding-x">
         <table>
@@ -404,7 +408,7 @@ function newIncidentFunc(){
 }
 
 #leafletmap {
-    height: 500px;
+    height: 750px;
 }
 
 .dialog-header {
@@ -429,6 +433,7 @@ function newIncidentFunc(){
 #location-dialog {
     height:7rem;
     width: 24rem;
+    z-index: 9999;
 }
 
 #go-button {
