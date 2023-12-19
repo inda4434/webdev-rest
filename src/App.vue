@@ -448,10 +448,10 @@ function newIncidentFunc(){
             </thead>
             <tbody>
                 <tr v-for="crime in crimes.slice(0, 50)" :key="crime.case_number">
-                    <td>{{ crime.incident_type }}</td>
+                    <td>{{ crime.incident }}</td>
                     <td>{{ crime.date }}</td>
                     <td>{{ crime.time }}</td>
-                    <td>{{ crime.neighborhood_name }}</td>
+                    <td>{{ neighborhood_options[crime.neighborhood_number] }}</td>
                     <td>{{ crime.block }}</td>
 
                     <!--<td>{{ crime.police_grid }}</td>-->
