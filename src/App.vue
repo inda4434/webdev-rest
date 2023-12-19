@@ -249,7 +249,10 @@ onMounted(async () => {
 
 //sick and twisted
 let checkedIncidents = ref([]);
-let checkedNeighborhoods = ref([])
+let checkedNeighborhoods = ref([]);
+let maxResults = ref('');
+let startDate = ref('');
+let endDate = ref('');
 
 //this are just the codes 
 const incident_options = ref({
@@ -294,33 +297,34 @@ const neighborhood_options = ref({
 
 
 function updateFilter(){
+    console.log('pls tell me you see me');
     let inc_list = '';
     let neighborhood_list = '';
     let date_list = '';
     let limit_list = '';
     let total_parameters;
 
-    if (checkedIncidents.length>0){
+    if (checkedIncidents.value.length>0){
         inc_list = "code="
-        if (checkedIncidents.length>1){
-            inc_list += checkedIncidents[0].value;
-            for (let i=1; i<checkedIncidents.length; i++){
-                inc_list += ","+ checkedIncidents[i].value;
+        if (checkedIncidents.value.length>1){
+            inc_list += checkedIncidents.value[0];
+            for (let i=1; i<checkedIncidents.value.length; i++){
+                inc_list += ","+ checkedIncidents.value[i];
             }
         } else {
-            inc_list=checkedIncidents[0].value;
+            inc_list=checkedIncidents.value[0];
         }
     }
 
-    if (checkedNeighborhoods.length>0){
+    if (checkedNeighborhoods.value.length>0){
         neighborhood_list = "neighborhood="
-        if (checkedNeighborhoods.length>1){
-            neighborhood_list += checkedNeighborhoods[0];
-            for (let i=1; i<checkedNeighborhoods.length; i++){
-                neighborhood_list += ","+ checkedNeighborhoods[i];
+        if (checkedNeighborhoods.value.length>1){
+            neighborhood_list += checkedNeighborhoods.value[0];
+            for (let i=1; i<checkedNeighborhoods.value.length; i++){
+                neighborhood_list += ","+ checkedNeighborhoods.value[i];
             }
         } else {
-            neighborhood_list=checkedNeighborhoods[0];
+            neighborhood_list=checkedNeighborhoods.value[0];
         }
     }
 
