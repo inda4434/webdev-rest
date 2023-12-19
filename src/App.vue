@@ -233,17 +233,13 @@ function addMarkersToMap() {
 
     for (let i = 0; i < map.neighborhood_markers.length; i++) {
         const neighborhood = map.neighborhood_markers[i];
-        const count = neighborhoodCounts[neighborhood_names[i]] || 0; // Use the count from the crimeCounts
+        const count = neighborhoodCounts[neighborhood_names[i]] || 0;
 
-        // Set the marker content
         const popupContent = `Neighborhood: ${neighborhood_names[i]}<br>Crime Count: ${count}`;
 
-        // Check if the marker is already created
         if (neighborhood.marker) {
-            // If marker exists, update the content
             neighborhood.marker.setPopupContent(popupContent);
         } else {
-            // If marker doesn't exist, create a new one
             const marker = L.marker(neighborhood.location).addTo(map.leaflet);
             marker.bindPopup(popupContent);
             neighborhood.marker = marker;
@@ -251,34 +247,28 @@ function addMarkersToMap() {
     }
 }
 
-const redIcon = L.icon({
-    iconUrl: 'path/to/red-marker-icon.png', // Replace with the actual path
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-});
-
 const handleCrimeSelection = (crime) => {
     const address = crime.block.replace(/(\d+)X/, '$10');
     console.log(address);
 
-    // Fetch coordinates using the Nominatim API
     getCoordinatesForAddress(address)
         .then(coordinates => {
-            const crimeMarker = L.marker(coordinates, { icon: redIcon }).addTo(map.leaflet);
+            console.log(coordinates);
+            const crimeMarker = L.marker(coordinates, { icon: L.divIcon({ className: 'leaflet-div-icon leaflet-div-icon-red' }) }).addTo(map.leaflet);
+
             const popupContent = `
                 <strong>Date:</strong> ${crime.date}<br>
                 <strong>Time:</strong> ${crime.time}<br>
                 <strong>Incident:</strong> ${crime.incident}<br>
-                <button onclick="deleteCrime('${crime.case_number}')">Delete</button>
+                <button onclick="deleteCrime(crime)">Delete</button>
             `;
 
             crimeMarker.bindPopup(popupContent).openPopup();
         })
         .catch(error => {
-            console.error('Error fetching coordinates:', error);
+            console.error('Error:', error);
         });
-};
+    };
 
 const getCoordinatesForAddress = (address) => {
     const nominatimApiUrl = 'https://nominatim.openstreetmap.org/search';
@@ -290,10 +280,11 @@ const getCoordinatesForAddress = (address) => {
     return fetch(`${nominatimApiUrl}?${new URLSearchParams(params)}`)
         .then(response => response.json())
         .then(data => {
+            console.log(data);
             if (data && data.length > 0) {
                 return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
             }
-            return [0, 0];
+            //return [0, 0];
         })
         .catch(error => {
             console.error('Error fetching coordinates:', error);
@@ -509,9 +500,83 @@ function newIncidentFunc(){
         </div>
     </div>
 
+    <!-- Filters -->
+    <div v-if="crimes.length > 0" :style="{ padding: '2rem' }">
+      <div class="grid-x grid-padding-x">
+        <p style="font-size: larger; font-weight: 800;">Filters</p>
 
+        <!-- Incident Type Filter -->
+        <div class="grid-x grid-padding-x">
+            <div class="cell">
+                <label for="incident_filter" style="font-weight: 750;">Filter by Incident Type:</label>
+            </div>
+            <div class="cell grid-x small-up-2 medium-up-3 large-up-4">
+            <div v-for="(key, value) in incident_options" class="cell">
+                <input
+                    type="checkbox"
+                    :id="key"
+                    :value="value"
+                    v-model="checkedIncidents"
+                />
+                <label :for="value">{{ key }}</label>
+            </div>
+            </div>
+        </div>
+
+
+        <!-- Neighborhood Filter -->
+        <div class="grid-x grid-padding-x">
+            <div class="cell">
+                <label for="neighborhood_filter" style="font-weight: 750;">Filter by Neighborhood:</label>
+            </div>
+            <div class="cell grid-x small-up-2 medium-up-3 large-up-4">
+                <div v-for="(key, value) in neighborhood_options" class="cell">
+                <input
+                    type="checkbox"
+                    :id="key"
+                    :value="value"
+                    v-model="checkedNeighborhoods"
+                />
+                <label :for="value">{{ key }}</label>
+            </div>
+            </div>
+        </div>
+
+
+        <!-- Date Range Filter -->
+        <div class="grid-x grid-padding-x">
+            <div class="cell">
+                <label for="date_filter" style="font-weight: 750;">Filter by Date Range:</label>
+            </div>
+            <div class="cell small-6 large-6 medium-6">
+                <label>Start Date:</label>
+                <input type="date" v-model="startDate" />
+            </div>
+            <div class="cell small-6 large-6 medium-6">
+                <label>End Date:</label>
+                <input type="date" v-model="endDate" />
+            </div>
+        </div>
+
+        <div class="grid-x grid-padding-x">
+        <!-- Max Incidents / Limit -->
+        <div class="cell">
+            <label for="incident_limit" style="font-weight: 750;">Maximum amount of incidents to show:</label>
+        </div>
+        <div class="cell small-6 large-6 medium-6">
+            <input type="number" v-model="maxResults" min="1" />
+        </div>
+
+        <!-- Update Filter Button -->
+            <div class="cell small-6 large-6 medium-6">
+                <button id="filter-button" @click="updateFilter">Update Filter</button>
+            </div>
+        </div>
+    </div>
+    </div>
 
     <div v-if="crimes.length > 0" class="grid-x grid-padding-x">
+    <div class="cell small-12 large-12 medium-12">
         <table>
             <thead>
                 <tr>
@@ -524,7 +589,7 @@ function newIncidentFunc(){
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="crime in crimes.slice(0, 50)" :key="crime.case_number">
+                <tr v-for="crime in crimes.slice(0, 5)" :key="crime.case_number">
                     <td>{{ crime.incident }}</td>
                     <td>{{ crime.date }}</td>
                     <td>{{ crime.time }}</td>
@@ -533,71 +598,18 @@ function newIncidentFunc(){
                     <td>
                         <button id="details-button" @click="handleCrimeSelection(crime)">View Details</button>
                     </td>
+                    <td>
+                        <button id="delete-button" @click="deleteCrime(crime.case_number)">Delete</button>
+                    </td>
 
                     <!--<td>{{ crime.police_grid }}</td>-->
                 </tr>
             </tbody>
         </table>
     </div>
-    <div v-else>
-      <p>Enter API URL to view crime data</p>
     </div>
-
-    
-    <!--FILTERS-->
-    <div>
-        <div class="grid-x grid-padding-x">
-            <h3>Filters</h3>
-            <!-- Incident Type Filter -->
-            <div class="cell small-11 large-11">
-                <label for="incident_filter"> Filter by Incident Type: </label>
-                <div v-for="(key, value) in incident_options">
-                    <input
-                        type="checkbox"
-                        :id="key"
-                        :value="value"
-                        v-model="checkedIncidents"
-                    />
-                    <label :for="value">{{ key }}</label>
-                </div>
-            </div>
-
-            <!-- Neighborhood Filter -->
-            <div class="cell small-11 large-11">
-                <label for="incident_filter"> Filter by Neighborhood: </label>
-                <div v-for="(key, value) in neighborhood_options">
-                    <input
-                        type="checkbox"
-                        :id="key"
-                        :value="value"
-                        v-model="checkedNeighborhoods"
-                    />
-                    <label :for="value">{{ key }}</label>
-                </div>
-            </div>
-
-            <!-- Date Range Filter -->
-            <div>
-                <div class="cell small-11 large-11">
-                    <label>Start Date:</label>
-                    <input type="date" v-model="startDate" />
-                </div>
-
-                <div class="cell small-11 large-11">
-                    <label>End Date:</label>
-                    <input type="date" v-model="endDate" />
-                </div>
-            </div>
-
-            <!--max incidents / limit-->
-            <div class="cell small-11 large-11">
-                <label for="incident_limit"> Maximum amount of incidents: </label>
-                <input type="number" v-model="maxResults" min="1" />
-            </div>
-
-            <!--update filter-->
-            <button @click="updateFilter">Update Filter</button>
-        </div>
+    <div v-else>
+      <p>No crime data to show</p>
     </div>
     
     <!--NEW INCIDENT FORM-->
@@ -657,6 +669,9 @@ function newIncidentFunc(){
 </template>
 
 <style>
+.h5 {
+    font-size: large;
+}
 #rest-dialog {
     width: 20rem;
     margin-top: 1rem;
@@ -696,7 +711,7 @@ function newIncidentFunc(){
     font-size: x-small;
 }
 
-#details-button {
+#details-button, #filter-button, #delete-button {
     background-color: #a0b8d2;
     color: #000000;
     padding: 8px 16px;
@@ -705,8 +720,19 @@ function newIncidentFunc(){
     cursor: pointer;
 }
 
-#details-button:hover {
+#details-button:hover, #filter-button:hover, #delete-button:hover {
     background-color: #427bb8; /* Change background color on hover */
+}
+
+#filter-button {
+    float: left;
+}
+
+.leaflet-div-icon-red {
+    background-color: rgb(125, 51, 51);
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
 }
 
 </style>
