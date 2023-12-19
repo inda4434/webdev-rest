@@ -4,9 +4,6 @@ import { reactive, ref, onMounted } from 'vue';
 
 let crime_url = ref('');
 let location_input = ref('');
-let startDate = ref('');
-let endDate = ref('');
-let maxResults = ref('');
 let dialog_err = ref(false);
 let crimes = ref([]);
 let map = reactive(
@@ -256,23 +253,23 @@ let checkedNeighborhoods = ref([])
 
 //this are just the codes 
 const incident_options = ref({
-    homicide:'100',
-    murder: '110,120',
-    rape: '210,220',
-    robbery:'300,311,312,313,314,321,322,323,324,331,332,333,334,341,342,343,344,351,352,353,354,361,363,364,371,372,373,374',
-    aggravated_assault: '400,410,411,412,420,421,422,430,431,432,440,441,442,450,451,452,453',
-    burglary: '500,510,511,513,515,516,520,521,523,525,526,530,531,533,535,536,540,541,543,545,546,550,551,553,555,556,560,561,563,565,566',
-    theft: '600,601,603,611,612,613,614,621,622,623,630,631,632,633,640,641,642,643,651,652,653,661,662,663,671,672,673,681,682,683,691,692,693',
-    motor_vehicle_theft: '700,710,711,712,720,721,722,730,731,732',
-    assault_domestic: '810,861,862,863',
-    arson: '900,901,903,905,911,913,915,921,922,923,925,931,933,941,942,951,961,971,972,975,981,982',
-    criminal_damage: '1400,1401,1410,1415,1416,1420,1425,1426,1430,1435,1436',
-    narcotics: '1800,1810,1811,1812,1813,1814,1815,1820,1822,1823,1824,1825,1830,1835,1840,1841,1842,1843,1844,1845,1850,1855,1860,1865,1870,1880,1885',
-    weapons: '2619',
-    death_investigation: '3100',
-    proactive_police_visit: '9954',
-    community_engagement: '9959',
-    proactive_foot_patrol: '9986'
+    '100':'homicide',
+    '110,120':'homicide',
+    '210,220': 'rape',
+    '300,311,312,313,314,321,322,323,324,331,332,333,334,341,342,343,344,351,352,353,354,361,363,364,371,372,373,374': 'robbery',
+    '400,410,411,412,420,421,422,430,431,432,440,441,442,450,451,452,453': 'aggravated_assault',
+    '500,510,511,513,515,516,520,521,523,525,526,530,531,533,535,536,540,541,543,545,546,550,551,553,555,556,560,561,563,565,566': 'burglary',
+    '600,601,603,611,612,613,614,621,622,623,630,631,632,633,640,641,642,643,651,652,653,661,662,663,671,672,673,681,682,683,691,692,693': 'theft',
+    '700,710,711,712,720,721,722,730,731,732': 'motor_vehicle_theft',
+    '810,861,862,863': 'assault_domestic',
+    '900,901,903,905,911,913,915,921,922,923,925,931,933,941,942,951,961,971,972,975,981,982': 'arson',
+    '1400,1401,1410,1415,1416,1420,1425,1426,1430,1435,1436': 'criminal_damage',
+    '1800,1810,1811,1812,1813,1814,1815,1820,1822,1823,1824,1825,1830,1835,1840,1841,1842,1843,1844,1845,1850,1855,1860,1865,1870,1880,1885': 'narcotics',
+    '2619': 'weapons',
+    '3100': 'death_investigation',
+    '9954': 'proactive_police_visit',
+    '9959': 'community_engagement',
+    '9986': 'proactive_foot_patrol'
 });
 
 const neighborhood_options = ref({
@@ -472,7 +469,7 @@ function newIncidentFunc(){
                     <input
                         type="checkbox"
                         :id="incident_type"
-                        :value="incident_type.value"
+                        :value="incident_type"
                         v-model="checkedIncidents"
                     />
                     <label :for="incident_type">{{ incident_type }}</label>
@@ -489,7 +486,7 @@ function newIncidentFunc(){
                         :value="neighborhood_number"
                         v-model="checkedNeighborhoods"
                     />
-                    <label :for="neighborhood_number">{{ neighborhood_number.value }}</label>
+                    <label :for="neighborhood_number">{{ neighborhood_number }}</label>
                 </div>
             </div>
 
