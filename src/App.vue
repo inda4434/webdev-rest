@@ -247,6 +247,119 @@ onMounted(async () => {
     addMarkersToMap();
 });
 
+//sick and twisted
+let checkedIncidents = ref([]);
+let checkedNeighborhoods = ref([])
+
+//this are just the codes 
+const incident_options = ref({
+    homicide:'100',
+    murder: '110,120',
+    rape: '210,220',
+    robbery:'300,311,312,313,314,321,322,323,324,331,332,333,334,341,342,343,344,351,352,353,354,361,363,364,371,372,373,374',
+    aggravated_assault: '400,410,411,412,420,421,422,430,431,432,440,441,442,450,451,452,453',
+    burglary: '500,510,511,513,515,516,520,521,523,525,526,530,531,533,535,536,540,541,543,545,546,550,551,553,555,556,560,561,563,565,566',
+    theft: '600,601,603,611,612,613,614,621,622,623,630,631,632,633,640,641,642,643,651,652,653,661,662,663,671,672,673,681,682,683,691,692,693',
+    motor_vehicle_theft: '700,710,711,712,720,721,722,730,731,732',
+    assault_domestic: '810,861,862,863',
+    arson: '900,901,903,905,911,913,915,921,922,923,925,931,933,941,942,951,961,971,972,975,981,982',
+    criminal_damage: '1400,1401,1410,1415,1416,1420,1425,1426,1430,1435,1436',
+    narcotics: '1800,1810,1811,1812,1813,1814,1815,1820,1822,1823,1824,1825,1830,1835,1840,1841,1842,1843,1844,1845,1850,1855,1860,1865,1870,1880,1885',
+    weapons: '2619',
+    death_investigation: '3100',
+    proactive_police_visit: '9954',
+    community_engagement: '9959',
+    proactive_foot_patrol: '9986'
+});
+
+const neighborhood_options = ref({
+    1: 'Conway/Battlecreek/Highwood',
+    2: 'Greater East Side',
+    3: 'West Side',
+    4: 'Dayton\'s Bluff',
+    5: 'Payne/Phalen',
+    6: 'North End',
+    7: 'Thomas/Dale(Frogtown)',
+    8: 'Summit/University',
+    9: 'West Seventh',
+    10: 'Como',
+    11: 'Hamline/Midway',
+    12: 'St. Anthony',
+    13: 'Union Park',
+    14: 'Macalester-Groveland',
+    15: 'Highland',
+    16: 'Summit Hill',
+    17: 'Capitol River'
+});
+
+
+function updateFilter(){
+    let inc_list = '';
+    let neighborhood_list = '';
+    let date_list = '';
+    let limit_list = '';
+    let total_parameters;
+
+    if (checkedIncidents.length>0){
+        inc_list = "code="
+        if (checkedIncidents.length>1){
+            inc_list += checkedIncidents[0].value;
+            for (let i=1; i<checkedIncidents.length; i++){
+                inc_list += ","+ checkedIncidents[i].value;
+            }
+        } else {
+            inc_list=checkedIncidents[0].value;
+        }
+    }
+
+    if (checkedNeighborhoods.length>0){
+        neighborhood_list = "neighborhood="
+        if (checkedNeighborhoods.length>1){
+            neighborhood_list += checkedNeighborhoods[0];
+            for (let i=1; i<checkedNeighborhoods.length; i++){
+                neighborhood_list += ","+ checkedNeighborhoods[i];
+            }
+        } else {
+            neighborhood_list=checkedNeighborhoods[0];
+        }
+    }
+
+    if (startDate.value && endDate.value){
+        date_list = "start_date="+startDate.value+"&end_date"+endDate.value;
+    } else if (startDate.value) {
+        date_list = "start_date="+startDate.value;
+    } else if (endDate.value) {
+        date_list = "end_date="+endDate.value;
+    }
+
+    if (maxResults.value) {
+        limit_list = maxResults.value;
+    } 
+
+    total_parameters = inc_list+'&'+neighborhood_list+'&'+date_list+'&'+limit_list;
+    if (total_parameters.includes('&&&')){
+        total_parameters.replace('&&&', '&');
+    } else if (total_parameters.includes('&&')){
+        total_parameters.replace('&&', '&');
+    }
+    if (total_parameters[0]=='&'){
+        total_parameters = total_parameters.substring(1);
+    }
+
+
+    fetch(`${crime_url.value}/incident?${total_parameters}`)
+    .then ((res) => {
+        return res.json();
+    })
+    .then((data) => {
+        console.log(data);
+    })
+    .catch((err) =>{
+        console.log(err)
+    });
+    
+}
+
 
 const newIncident = ref({
     case_number: '',
@@ -342,6 +455,63 @@ function newIncidentFunc(){
     </div>
     <div v-else>
       <p>Enter API URL to view crime data</p>
+    </div>
+
+    
+    <!--FILTERS-->
+    <div>
+        <div class="grid-x grid-padding-x">
+            <h3>Filters</h3>
+            <!-- Incident Type Filter -->
+            <div class="cell small-11 large-11">
+                <label for="incident_filter"> Filter by Incident Type: </label>
+                <div v-for="incident_type in incident_options" :key="indicent_type">
+                    <input
+                        type="checkbox"
+                        :id="incident_type"
+                        :value="indident_type.value"
+                        v-model="checkedIncidents"
+                    />
+                    <label :for="incident_type">{{ incident_type }}</label>
+                </div>
+            </div>
+
+            <!-- Neighborhood Filter -->
+            <div class="cell small-11 large-11">
+                <label for="incident_filter"> Filter by Neighborhood: </label>
+                <div v-for="neighborhood_number in neighborhood_options" :key="neighborhood_number">
+                    <input
+                        type="checkbox"
+                        :id="neighborhood_number"
+                        :value="neighborhood_number"
+                        v-model="checkedNeighborhoods"
+                    />
+                    <label :for="neighborhood_number">{{ neighborhood_number.value }}</label>
+                </div>
+            </div>
+
+            <!-- Date Range Filter -->
+            <div>
+                <div class="cell small-11 large-11">
+                    <label>Start Date:</label>
+                    <input type="date" v-model="startDate" />
+                </div>
+
+                <div class="cell small-11 large-11">
+                    <label>End Date:</label>
+                    <input type="date" v-model="endDate" />
+                </div>
+            </div>
+
+            <!--max incidents / limit-->
+            <div class="cell small-11 large-11">
+                <label for="incident_limit"> Maximum amount of incidents: </label>
+                <input type="number" v-model="maxResults" min="1" />
+            </div>
+
+            <!--update filter-->
+            <button @click="updateFilter">Update Filter</button>
+        </div>
     </div>
     
     <!--NEW INCIDENT FORM-->
