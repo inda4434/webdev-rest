@@ -10,7 +10,7 @@ const db_filename = path.join(__dirname, '../db', 'stpaul_crime.sqlite3');
 
 console.log(db_filename);
 
-const port = 8000;
+const port = 8001;
 
 let app = express();
 app.use(express.json());

@@ -4,6 +4,9 @@ import { reactive, ref, onMounted } from 'vue';
 
 let crime_url = ref('');
 let location_input = ref('');
+let startDate = ref('');
+let endDate = ref('');
+let maxResults = ref('');
 let dialog_err = ref(false);
 let crimes = ref([]);
 let map = reactive(
@@ -465,11 +468,11 @@ function newIncidentFunc(){
             <!-- Incident Type Filter -->
             <div class="cell small-11 large-11">
                 <label for="incident_filter"> Filter by Incident Type: </label>
-                <div v-for="incident_type in incident_options" :key="indicent_type">
+                <div v-for="incident_type in incident_options" :key="incident_type">
                     <input
                         type="checkbox"
                         :id="incident_type"
-                        :value="indident_type.value"
+                        :value="incident_type.value"
                         v-model="checkedIncidents"
                     />
                     <label :for="incident_type">{{ incident_type }}</label>
