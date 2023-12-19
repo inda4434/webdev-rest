@@ -41,6 +41,26 @@ let map = reactive(
     }
 );
 
+const neighborhood_names = [
+    "Conway/Battlecreek/Highwood",
+    "Greater East Side",
+    "West Side",
+    "Dayton's Bluff",
+    "Payne/Phalen",
+    "North End",
+    "Thomas/Dale(Frogtown)",
+    "Summit/University",
+    "West Seventh",
+    "Como",
+    "Hamline/Midway",
+    "St. Anthony",
+    "Union Park",
+    "Macalester-Groveland",
+    "Highland",
+    "Summit Hill",
+    "Capitol River"
+]
+
 // Vue callback for once <template> HTML has been added to web page
 onMounted(() => {
     // Create Leaflet map (set bounds and valied zoom levels)
@@ -190,7 +210,7 @@ function closeDialog() {
     }
 }
 
-/// Function to get crime counts for each neighborhood
+// Function to get crime counts for each neighborhood
 function calculateCrimeCounts() {
     const neighborhoodCounts = {};
 
@@ -211,41 +231,98 @@ function calculateCrimeCounts() {
 function addMarkersToMap() {
     const neighborhoodCounts = calculateCrimeCounts();
 
-    for (const [neighborhoodName, crimeCount] of Object.entries(neighborhoodCounts)) {
-            getCoordinatesForNeighborhood(neighborhoodName).then((coordinates) => {
-            const marker = L.marker(coordinates).addTo(map.leaflet);
-            marker.bindPopup(`Neighborhood: ${neighborhoodName}<br>Crime Count: ${crimeCount}`);
-        });
+    for (let i = 0; i < map.neighborhood_markers.length; i++) {
+        const neighborhood = map.neighborhood_markers[i];
+        const count = neighborhoodCounts[neighborhood_names[i]] || 0; // Use the count from the crimeCounts
+
+        // Set the marker content
+        const popupContent = `Neighborhood: ${neighborhood_names[i]}<br>Crime Count: ${count}`;
+
+        // Check if the marker is already created
+        if (neighborhood.marker) {
+            // If marker exists, update the content
+            neighborhood.marker.setPopupContent(popupContent);
+        } else {
+            // If marker doesn't exist, create a new one
+            const marker = L.marker(neighborhood.location).addTo(map.leaflet);
+            marker.bindPopup(popupContent);
+            neighborhood.marker = marker;
+        }
     }
 }
 
-// Function to get coordinates for a neighborhood using Nominatim API
-async function getCoordinatesForNeighborhood(neighborhoodName) {
+const redIcon = L.icon({
+    iconUrl: 'path/to/red-marker-icon.png', // Replace with the actual path
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+});
+
+const handleCrimeSelection = (crime) => {
+    const address = crime.block.replace(/(\d+)X/, '$10');
+    console.log(address);
+
+    // Fetch coordinates using the Nominatim API
+    getCoordinatesForAddress(address)
+        .then(coordinates => {
+            const crimeMarker = L.marker(coordinates, { icon: redIcon }).addTo(map.leaflet);
+            const popupContent = `
+                <strong>Date:</strong> ${crime.date}<br>
+                <strong>Time:</strong> ${crime.time}<br>
+                <strong>Incident:</strong> ${crime.incident}<br>
+                <button onclick="deleteCrime('${crime.case_number}')">Delete</button>
+            `;
+
+            crimeMarker.bindPopup(popupContent).openPopup();
+        })
+        .catch(error => {
+            console.error('Error fetching coordinates:', error);
+        });
+};
+
+const getCoordinatesForAddress = (address) => {
     const nominatimApiUrl = 'https://nominatim.openstreetmap.org/search';
     const params = {
-        q: neighborhoodName,
+        q: address,
         format: 'json',
     };
 
-    try {
-        const response = await fetch(`${nominatimApiUrl}?${new URLSearchParams(params)}`);
-        const data = await response.json();
+    return fetch(`${nominatimApiUrl}?${new URLSearchParams(params)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+            }
+            return [0, 0];
+        })
+        .catch(error => {
+            console.error('Error fetching coordinates:', error);
+            throw error;
+        });
+};
 
-        if (data && data.length > 0) {
-            return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+function deleteCrime(caseNumber) {
+    const apiUrl = 'http://localhost:8000/remove-incident';
+    fetch(apiUrl, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ case_number: caseNumber }),
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log(`Crime with case number ${caseNumber} deleted successfully`);
+            const updatedCrimes = crimes.value.filter(crime => crime.case_number !== caseNumber);
+            crimes.value = updatedCrimes;
+        } else {
+            console.error(`Failed to delete crime with case number ${caseNumber}`);
         }
-    } catch (error) {
-        console.error('Error fetching coordinates:', error);
-    }
-
-    return [0, 0];
+    })
+    .catch(error => {
+        console.error('Error making delete request:', error);
+    });
 }
-
-onMounted(async () => {
-    await initializeCrimes();
-    await new Promise(resolve => map.leaflet.whenReady(resolve));
-    addMarkersToMap();
-});
 
 //sick and twisted
 let checkedIncidents = ref([]);
@@ -453,6 +530,9 @@ function newIncidentFunc(){
                     <td>{{ crime.time }}</td>
                     <td>{{ neighborhood_options[crime.neighborhood_number] }}</td>
                     <td>{{ crime.block }}</td>
+                    <td>
+                        <button id="details-button" @click="handleCrimeSelection(crime)">View Details</button>
+                    </td>
 
                     <!--<td>{{ crime.police_grid }}</td>-->
                 </tr>
@@ -614,6 +694,19 @@ function newIncidentFunc(){
 
 #go-button {
     font-size: x-small;
+}
+
+#details-button {
+    background-color: #a0b8d2;
+    color: #000000;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#details-button:hover {
+    background-color: #427bb8; /* Change background color on hover */
 }
 
 </style>
