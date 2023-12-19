@@ -212,7 +212,7 @@ function addMarkersToMap() {
     const neighborhoodCounts = calculateCrimeCounts();
 
     for (const [neighborhoodName, crimeCount] of Object.entries(neighborhoodCounts)) {
-        getCoordinatesForNeighborhood(neighborhoodName).then((coordinates) => {
+            getCoordinatesForNeighborhood(neighborhoodName).then((coordinates) => {
             const marker = L.marker(coordinates).addTo(map.leaflet);
             marker.bindPopup(`Neighborhood: ${neighborhoodName}<br>Crime Count: ${crimeCount}`);
         });
@@ -256,23 +256,22 @@ let endDate = ref('');
 
 //this are just the codes 
 const incident_options = ref({
-    '100':'homicide',
-    '110,120':'homicide',
-    '210,220': 'rape',
-    '300,311,312,313,314,321,322,323,324,331,332,333,334,341,342,343,344,351,352,353,354,361,363,364,371,372,373,374': 'robbery',
-    '400,410,411,412,420,421,422,430,431,432,440,441,442,450,451,452,453': 'aggravated_assault',
-    '500,510,511,513,515,516,520,521,523,525,526,530,531,533,535,536,540,541,543,545,546,550,551,553,555,556,560,561,563,565,566': 'burglary',
-    '600,601,603,611,612,613,614,621,622,623,630,631,632,633,640,641,642,643,651,652,653,661,662,663,671,672,673,681,682,683,691,692,693': 'theft',
-    '700,710,711,712,720,721,722,730,731,732': 'motor_vehicle_theft',
-    '810,861,862,863': 'assault_domestic',
-    '900,901,903,905,911,913,915,921,922,923,925,931,933,941,942,951,961,971,972,975,981,982': 'arson',
-    '1400,1401,1410,1415,1416,1420,1425,1426,1430,1435,1436': 'criminal_damage',
-    '1800,1810,1811,1812,1813,1814,1815,1820,1822,1823,1824,1825,1830,1835,1840,1841,1842,1843,1844,1845,1850,1855,1860,1865,1870,1880,1885': 'narcotics',
-    '2619': 'weapons',
-    '3100': 'death_investigation',
-    '9954': 'proactive_police_visit',
-    '9959': 'community_engagement',
-    '9986': 'proactive_foot_patrol'
+    '100,110,120':'Homicide',
+    '210,220': 'Rape',
+    '300,311,312,313,314,321,322,323,324,331,332,333,334,341,342,343,344,351,352,353,354,361,363,364,371,372,373,374': 'Robbery',
+    '400,410,411,412,420,421,422,430,431,432,440,441,442,450,451,452,453': 'Aggravated Assault',
+    '500,510,511,513,515,516,520,521,523,525,526,530,531,533,535,536,540,541,543,545,546,550,551,553,555,556,560,561,563,565,566': 'Burglary',
+    '600,601,603,611,612,613,614,621,622,623,630,631,632,633,640,641,642,643,651,652,653,661,662,663,671,672,673,681,682,683,691,692,693': 'Theft',
+    '700,710,711,712,720,721,722,730,731,732': 'Motor Vehicle Theft',
+    '810,861,862,863': 'Assault Domestic',
+    '900,901,903,905,911,913,915,921,922,923,925,931,933,941,942,951,961,971,972,975,981,982': 'Arson',
+    '1400,1401,1410,1415,1416,1420,1425,1426,1430,1435,1436': 'Criminal Damage',
+    '1800,1810,1811,1812,1813,1814,1815,1820,1822,1823,1824,1825,1830,1835,1840,1841,1842,1843,1844,1845,1850,1855,1860,1865,1870,1880,1885': 'Narcotics',
+    '2619': 'Weapons',
+    '3100': 'Death Investigation',
+    '9954': 'Proactive Police Visit',
+    '9959': 'Community Engagement',
+    '9986': 'Proactive Foot Patrol'
 });
 
 const neighborhood_options = ref({
@@ -312,7 +311,7 @@ function updateFilter(){
                 inc_list += ","+ checkedIncidents.value[i];
             }
         } else {
-            inc_list=checkedIncidents.value[0];
+            inc_list += checkedIncidents.value[0];
         }
     }
 
@@ -320,16 +319,17 @@ function updateFilter(){
         neighborhood_list = "neighborhood="
         if (checkedNeighborhoods.value.length>1){
             neighborhood_list += checkedNeighborhoods.value[0];
+
             for (let i=1; i<checkedNeighborhoods.value.length; i++){
                 neighborhood_list += ","+ checkedNeighborhoods.value[i];
             }
         } else {
-            neighborhood_list=checkedNeighborhoods.value[0];
+            neighborhood_list += checkedNeighborhoods.value[0];
         }
     }
 
     if (startDate.value && endDate.value){
-        date_list = "start_date="+startDate.value+"&end_date"+endDate.value;
+        date_list = "start_date="+startDate.value+"&end_date="+endDate.value;
     } else if (startDate.value) {
         date_list = "start_date="+startDate.value;
     } else if (endDate.value) {
@@ -337,26 +337,28 @@ function updateFilter(){
     }
 
     if (maxResults.value) {
-        limit_list = maxResults.value;
+        limit_list = "limit=" + maxResults.value;
     } 
 
     total_parameters = inc_list+'&'+neighborhood_list+'&'+date_list+'&'+limit_list;
     if (total_parameters.includes('&&&')){
-        total_parameters.replace('&&&', '&');
+        total_parameters = total_parameters.replace('&&&', '&');
     } else if (total_parameters.includes('&&')){
-        total_parameters.replace('&&', '&');
+        total_parameters = total_parameters.replace('&&', '&');
     }
     if (total_parameters[0]=='&'){
         total_parameters = total_parameters.substring(1);
     }
 
-
-    fetch(`${crime_url.value}/incident?${total_parameters}`)
+    console.log(total_parameters);
+    fetch(`${crime_url.value}/incidents?${total_parameters}`)
     .then ((res) => {
+        console.log(res);
         return res.json();
     })
     .then((data) => {
         console.log(data);
+        crimes.value = data;
     })
     .catch((err) =>{
         console.log(err)
@@ -469,28 +471,28 @@ function newIncidentFunc(){
             <!-- Incident Type Filter -->
             <div class="cell small-11 large-11">
                 <label for="incident_filter"> Filter by Incident Type: </label>
-                <div v-for="incident_type in incident_options" :key="incident_type">
+                <div v-for="(key, value) in incident_options">
                     <input
                         type="checkbox"
-                        :id="incident_type"
-                        :value="incident_type"
+                        :id="key"
+                        :value="value"
                         v-model="checkedIncidents"
                     />
-                    <label :for="incident_type">{{ incident_type }}</label>
+                    <label :for="value">{{ key }}</label>
                 </div>
             </div>
 
             <!-- Neighborhood Filter -->
             <div class="cell small-11 large-11">
                 <label for="incident_filter"> Filter by Neighborhood: </label>
-                <div v-for="neighborhood_number in neighborhood_options" :key="neighborhood_number">
+                <div v-for="(key, value) in neighborhood_options">
                     <input
                         type="checkbox"
-                        :id="neighborhood_number"
-                        :value="neighborhood_number"
+                        :id="key"
+                        :value="value"
                         v-model="checkedNeighborhoods"
                     />
-                    <label :for="neighborhood_number">{{ neighborhood_number }}</label>
+                    <label :for="value">{{ key }}</label>
                 </div>
             </div>
 
