@@ -637,7 +637,7 @@ function newIncidentFunc(){
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="crime in crimes.slice(0, 1000)" :key="crime.case_number" :class="getCrimeCategory(crime.code)">
+                <tr v-for="crime in crimes.slice(0, 100)" :key="crime.case_number" :id="getCrimeCategory(crime.code)">
                     <td>{{ crime.incident }}</td>
                     <td>{{ crime.date }}</td>
                     <td>{{ crime.time }}</td>
@@ -810,20 +810,20 @@ function newIncidentFunc(){
     float: left;
 }
 
-.violent-crime {
-    background-color: #f1c2c2; /* Red background for violent crimes */
+#violent-crime, .violent-crime {
+    background-color: #f8bdbd; /* Red background for violent crimes */
 }
 
-.property-crime {
-    background-color: #f4d3a2; /* Orange background for property crimes */
+#property-crime, .property-crime {
+    background-color: #fad091; /* Orange background for property crimes */
 }
 
-.drug-crime {
-    background-color: #efebb9; /* Yellow background for drug crimes */
+#drug-crime, .drug-crime {
+    background-color: #f6f485; /* Yellow background for drug crimes */
 }
 
-.other-crime {
-    background-color: #dadad8; /* Grey background for other crimes */
+#other-crime, .other-crime {
+    background-color: #c7f4af; /* Green background for other crimes */
 }
 .legend {
     display: flex;
@@ -833,13 +833,15 @@ function newIncidentFunc(){
 .legend-item {
     display: flex;
     align-items: center;
-    margin-right: 20px;
+    margin-right: 1rem;
+    margin-left: 1rem;
 }
 
 .legend-color {
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
     margin-right: 8px;
+    border: 1px solid;
 }
 
 
