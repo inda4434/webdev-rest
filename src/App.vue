@@ -570,7 +570,6 @@ function newIncidentFunc(){
     <!-- Filters -->
     <div :style="{ padding: '2rem' }">
       <div class="grid-x grid-padding-x">
-        <p style="font-size: larger; font-weight: 800;">Filters</p>
 
         <!-- Incident Type Filter -->
         <div class="grid-x grid-padding-x">
@@ -656,7 +655,7 @@ function newIncidentFunc(){
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="crime in crimes.slice(0, 100)" :key="crime.case_number" :id="getCrimeCategory(crime.code)">
+                <tr v-for="crime in crimes.slice(0, 1000)" :key="crime.case_number" :id="getCrimeCategory(crime.code)">
                     <td>{{ crime.incident }}</td>
                     <td>{{ crime.date }}</td>
                     <td>{{ crime.time }}</td>
