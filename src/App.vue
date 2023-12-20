@@ -235,7 +235,10 @@ function addMarkersToMap() {
         const neighborhood = map.neighborhood_markers[i];
         const count = neighborhoodCounts[neighborhood_names[i]] || 0;
 
-        const popupContent = `Neighborhood: ${neighborhood_names[i]}<br>Crime Count: ${count}`;
+        const popupContent = `<div class="popup-content">
+            Neighborhood: ${neighborhood_names[i]}<br>
+            Crime Count: ${count}
+            </div>`;
 
         if (neighborhood.marker) {
             neighborhood.marker.setPopupContent(popupContent);
@@ -527,11 +530,17 @@ function newIncidentFunc(){
         <br/>
         <button class="button" type="button" @click="closeDialog">OK</button>
     </dialog>
-
-    <dialog id="location-dialog" hidden open style="position: absolute; top: 10px; left: 10px;">
+    <!--
+    <dialog id="location-dialog" hidden open>
         <input id="location" class="dialog-input" type="text" v-model="location_input" placeholder="Enter location"/>
         <button id="go-button" class="button" type="button" @click="updateMapLocation">Go</button>
     </dialog>
+-->
+    <div id="location-dialog" class="container">
+        <label for="location-dialog" style="font-weight: 750;">Go to a location on map:</label>
+        <input id="location" class="dialog-input" type="text" v-model="location_input" placeholder="Enter location"/>
+        <button id="go-button" class="button" type="button" @click="updateMapLocation">Go</button>
+    </div>
 
     <div class="grid-container">
         <div class="grid-x grid-padding-x">
@@ -759,14 +768,29 @@ function newIncidentFunc(){
     color: #D32323;
 }
 
+.container {
+    position: relative;
+}
+
 #location-dialog {
-    height:7rem;
+    height:8rem;
     width: 24rem;
-    z-index: 9999;
+    padding: 0.7rem;
+    padding-bottom: 5rem;
+    margin: 0.2rem;
+    border: 1px solid #000000;
+    z-index: 10000;
+}
+.popup-content {
+    z-index: 10000;
 }
 
 #go-button {
+    margin-top: 3rem;
     font-size: x-small;
+    position: absolute;
+    bottom: 0px;
+    left: 1rem;
 }
 
 #details-button, #filter-button, #delete-button {
@@ -784,13 +808,6 @@ function newIncidentFunc(){
 
 #filter-button {
     float: left;
-}
-
-.leaflet-div-icon-red {
-    background-color: rgb(125, 51, 51);
-    border-radius: 50%;
-    width: 12px;
-    height: 12px;
 }
 
 .violent-crime {
