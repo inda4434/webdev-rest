@@ -637,7 +637,7 @@ function newIncidentFunc(){
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="crime in crimes.slice(0, 50)" :key="crime.case_number" :class="getCrimeCategory(crime.code)">
+                <tr v-for="crime in crimes.slice(0, 1000)" :key="crime.case_number" :class="getCrimeCategory(crime.code)">
                     <td>{{ crime.incident }}</td>
                     <td>{{ crime.date }}</td>
                     <td>{{ crime.time }}</td>
