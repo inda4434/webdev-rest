@@ -368,9 +368,7 @@ function getCrimeCategory(code) {
         return 'violent-crime';
     } else if ((codeNumber >= 900 && codeNumber <= 999) || (codeNumber >= 500 && codeNumber <= 699) || (codeNumber >= 600 && codeNumber <= 699) || (codeNumber >= 700 && codeNumber <= 799) || (codeNumber >= 1400 && codeNumber <= 1499)) {
         return 'property-crime';
-    } else if ((codeNumber >= 1800 && codeNumber <= 1899)) {
-        return 'drug-crime';
-    }else {
+    } else {
         console.log("other crime");
         return 'other-crime';
     }
@@ -685,10 +683,6 @@ function newIncidentFunc(){
             <div class="legend-label">Property Crime</div>
         </div>
         <div class="legend-item">
-            <div class="legend-color drug-crime"></div>
-            <div class="legend-label">Drug Crime</div>
-        </div>
-        <div class="legend-item">
             <div class="legend-color other-crime"></div>
             <div class="legend-label">Other Crime</div>
         </div>
@@ -837,13 +831,10 @@ function newIncidentFunc(){
     background-color: #fad091; /* Orange background for property crimes */
 }
 
-#drug-crime, .drug-crime {
-    background-color: #f6f485; /* Yellow background for drug crimes */
+#other-crime, .other-crime {
+    background-color: #f6f485; /* Yellow background for other crimes */
 }
 
-#other-crime, .other-crime {
-    background-color: #c7f4af; /* Green background for other crimes */
-}
 .legend {
     display: flex;
     margin-top: 10px;
