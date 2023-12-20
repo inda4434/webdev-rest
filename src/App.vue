@@ -247,28 +247,51 @@ function addMarkersToMap() {
     }
 }
 
+function deleteCrimeMarker(markerId) {
+    const marker = map.leaflet._layers[markerId];
+    if (marker) {
+        this.map.leaflet.removeLayer(marker);
+    }
+}
+
 const handleCrimeSelection = (crime) => {
     const address = crime.block.replace(/(\d+)X/, '$10');
     console.log(address);
 
     getCoordinatesForAddress(address)
         .then(coordinates => {
+        if ((coordinates) && (coordinates[0] !== 0 && coordinates[1] !== 0)) {
             console.log(coordinates);
-            const crimeMarker = L.marker(coordinates, { icon: L.divIcon({ className: 'leaflet-div-icon leaflet-div-icon-red' }) }).addTo(map.leaflet);
-
-            const popupContent = `
+            var redIcon = L.icon({
+                iconUrl: '/location-dot.svg',
+                iconSize: [25, 45],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+            });
+            const crimeMarker = L.marker(coordinates, {icon: redIcon}).addTo(map.leaflet);
+            /*
+            crimeMarker.bindPopup(`
                 <strong>Date:</strong> ${crime.date}<br>
                 <strong>Time:</strong> ${crime.time}<br>
                 <strong>Incident:</strong> ${crime.incident}<br>
-                <button onclick="deleteCrime(crime)">Delete</button>
-            `;
-
-            crimeMarker.bindPopup(popupContent).openPopup();
-        })
+                <button class="button" type="button" @click="deleteCrimeMarker('${crimeMarker._leaflet_id}')">Delete</button>
+                `);
+            */
+            //crimeMarker.bindPopup(popupContent).openPopup();
+            const mapContainer = map.leaflet.getContainer();
+            mapContainer.scrollIntoView({ behavior: 'smooth' });
+        } else {
+                showAlert("Crime cannot be located on the map");
+        }})
         .catch(error => {
             console.error('Error:', error);
         });
     };
+
+function showAlert(message) {
+    alert(message);
+}
+
 
 const getCoordinatesForAddress = (address) => {
     const nominatimApiUrl = 'https://nominatim.openstreetmap.org/search';
@@ -331,16 +354,6 @@ function getCrimeCategory(code) {
     }
 }
 
-/*
-function getCrimeCategoryClass(crime) {
-        const category = getCrimeCategory(crime);
-        return {
-            'violent-crime': category === 'Violent Crime',
-            'property-crime': category === 'Property Crime',
-            'other-crime': category === 'Other Crime',
-        };
-    }
-*/
 //sick and twisted
 let checkedIncidents = ref([]);
 let checkedNeighborhoods = ref([]);
@@ -515,7 +528,7 @@ function newIncidentFunc(){
         <button class="button" type="button" @click="closeDialog">OK</button>
     </dialog>
 
-    <dialog id="location-dialog" hidden open>
+    <dialog id="location-dialog" hidden open style="position: absolute; top: 10px; left: 10px;">
         <input id="location" class="dialog-input" type="text" v-model="location_input" placeholder="Enter location"/>
         <button id="go-button" class="button" type="button" @click="updateMapLocation">Go</button>
     </dialog>
@@ -615,14 +628,14 @@ function newIncidentFunc(){
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="crime in crimes.slice(0, 15)" :key="crime.case_number" :class=getCrimeCategory(crime.code)>
+                <tr v-for="crime in crimes.slice(0, 50)" :key="crime.case_number" :class="getCrimeCategory(crime.code)">
                     <td>{{ crime.incident }}</td>
                     <td>{{ crime.date }}</td>
                     <td>{{ crime.time }}</td>
                     <td>{{ neighborhood_options[crime.neighborhood_number] }}</td>
                     <td>{{ crime.block }}</td>
                     <td>
-                        <button id="details-button" @click="handleCrimeSelection(crime)">View Details</button>
+                        <button id="details-button" @click="handleCrimeSelection(crime)">See on Map</button>
                     </td>
                     <td>
                         <button id="delete-button" @click="deleteCrime(crime.case_number)">Delete</button>
@@ -724,7 +737,7 @@ function newIncidentFunc(){
 }
 
 #leafletmap {
-    height: 750px;
+    height: 500px;
 }
 
 .dialog-header {
@@ -757,8 +770,8 @@ function newIncidentFunc(){
 }
 
 #details-button, #filter-button, #delete-button {
-    background-color: #b8eef7;
-    color: #000000;
+    background-color: #4787e6;
+    color: #ffffff;
     padding: 8px 16px;
     border: none;
     border-radius: 4px;
@@ -766,7 +779,7 @@ function newIncidentFunc(){
 }
 
 #details-button:hover, #filter-button:hover, #delete-button:hover {
-    background-color: #a9caed; /* Change background color on hover */
+    background-color: #084e99; /* Change background color on hover */
 }
 
 #filter-button {
