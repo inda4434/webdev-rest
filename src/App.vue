@@ -265,24 +265,44 @@ const handleCrimeSelection = (crime) => {
         .then(coordinates => {
         if ((coordinates) && (coordinates[0] !== 0 && coordinates[1] !== 0)) {
             console.log(coordinates);
-            var redIcon = L.icon({
+            if ((coordinates[0] <= map.bounds.nw.lat && coordinates[0] >= map.bounds.se.lat) && 
+            (coordinates[1] <= map.bounds.se.lng && coordinates[1] >= map.bounds.nw.lng)) {
+            var blackIcon = L.icon({
                 iconUrl: '/location-dot.svg',
-                iconSize: [25, 45],
+                iconSize: [25, 41],
                 iconAnchor: [12, 41],
                 popupAnchor: [1, -34],
             });
-            const crimeMarker = L.marker(coordinates, {icon: redIcon}).addTo(map.leaflet);
+            const crimeMarker = L.marker(coordinates, { icon: blackIcon }).addTo(map.leaflet);
+            crimeMarker.bindPopup(`
+                <strong>Date:</strong> ${crime.date}<br>
+                <strong>Time:</strong> ${crime.time}<br>
+                <strong>Incident:</strong> ${crime.incident}<br>
+                <button class="button" type="button" @click="deleteCrimeMarker()">Delete</button>
+                `).openPopup();
+
+            const deleteCrimeMarker = () => {
+            crimeMarker.removeFrom(map.leaflet);
+            };
+
+            map.leaflet.on('popupopen', function (e) {
+                map.leaflet.deleteCrimeMarker = deleteCrimeMarker;
+            });
             /*
+            const crimeMarker = L.marker(coordinates, {icon: blackIcon}).addTo(map.leaflet);
             crimeMarker.bindPopup(`
                 <strong>Date:</strong> ${crime.date}<br>
                 <strong>Time:</strong> ${crime.time}<br>
                 <strong>Incident:</strong> ${crime.incident}<br>
                 <button class="button" type="button" @click="deleteCrimeMarker('${crimeMarker._leaflet_id}')">Delete</button>
-                `);
-            */
+                `).openPopup();
             //crimeMarker.bindPopup(popupContent).openPopup();
+            */
             const mapContainer = map.leaflet.getContainer();
             mapContainer.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            showAlert("Crime location is outside of map bounds");
+        }
         } else {
                 showAlert("Crime cannot be located on the map");
         }})
@@ -306,11 +326,10 @@ const getCoordinatesForAddress = (address) => {
     return fetch(`${nominatimApiUrl}?${new URLSearchParams(params)}`)
         .then(response => response.json())
         .then(data => {
-            console.log(data);
             if (data && data.length > 0) {
                 return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
             }
-            //return [0, 0];
+            return [0, 0];
         })
         .catch(error => {
             console.error('Error fetching coordinates:', error);
@@ -536,7 +555,7 @@ function newIncidentFunc(){
         <button id="go-button" class="button" type="button" @click="updateMapLocation">Go</button>
     </dialog>
 -->
-    <div id="location-dialog" class="container">
+    <div id="location-dialog" class="container" hidden open>
         <label for="location-dialog" style="font-weight: 750;">Go to a location on map:</label>
         <input id="location" class="dialog-input" type="text" v-model="location_input" placeholder="Enter location"/>
         <button id="go-button" class="button" type="button" @click="updateMapLocation">Go</button>
@@ -549,7 +568,7 @@ function newIncidentFunc(){
     </div>
 
     <!-- Filters -->
-    <div v-if="crimes.length > 0" :style="{ padding: '2rem' }">
+    <div :style="{ padding: '2rem' }">
       <div class="grid-x grid-padding-x">
         <p style="font-size: larger; font-weight: 800;">Filters</p>
 
@@ -655,9 +674,6 @@ function newIncidentFunc(){
             </tbody>
         </table>
     </div>
-    </div>
-    <div v-else>
-      <p>No crime data to show</p>
     </div>
 
     <div class="legend">
