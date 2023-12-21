@@ -507,7 +507,7 @@ const newIncident = ref({
     block: ''
 });
 
-function newIncidentFunc(){
+function newIncidentFunc() {
     console.log(newIncident.value);
     fetch(`${crime_url.value}/new-incident`, {
         method: 'PUT',
@@ -516,9 +516,9 @@ function newIncidentFunc(){
         },
         body: JSON.stringify(newIncident.value),
     })
-    .then (response => {
-        if (response.ok){
-            console.log('new form added');
+    .then(response => {
+        if (response.ok) {
+            console.log('New incident added');
             newIncident.value = {
                 case_number: '',
                 date: '',
@@ -529,14 +529,22 @@ function newIncidentFunc(){
                 neighborhood_number: '',
                 block: ''
             };
-        }
-        else {
+
+            // Fetch the updated list of incidents after the successful API call
+            return fetch(`${crime_url.value}/incidents`);
+        } else {
             console.log(response);
-            console.log('sucks');
+            console.log('Failed to add new incident');
+            throw new Error('Failed to add new incident');
         }
     })
-    .catch(err =>{
-        console.log(err)
+    .then(response => response.json())
+    .then(updatedIncidents => {
+        crimes.value = updatedIncidents.slice(1, updatedIncidents.length-1);
+        console.log('Crimes object updated with new incident');
+    })
+    .catch(err => {
+        console.error(err);
     });
 }
 
