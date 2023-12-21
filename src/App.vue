@@ -278,7 +278,7 @@ const handleCrimeSelection = (crime) => {
                 <strong>Date:</strong> ${crime.date}<br>
                 <strong>Time:</strong> ${crime.time}<br>
                 <strong>Incident:</strong> ${crime.incident}<br>
-                <button class="button" type="button" @click="deleteCrimeMarker()">Delete</button>
+                <button class="button" id="delete-marker" type="button" @click="deleteCrimeMarker()">Delete</button>
                 `).openPopup();
 
             const deleteCrimeMarker = () => {
@@ -814,6 +814,14 @@ function newIncidentFunc(){
     border: none;
     border-radius: 4px;
     cursor: pointer;
+}
+
+#delete-marker {
+    font-size: 0.8rem;
+    padding: 0.25rem;
+    margin-top: 0.7rem;
+    height: 1.75rem;
+    width: 3.5rem;
 }
 
 #details-button:hover, #filter-button:hover, #delete-button:hover, #sub_new_inc:hover {
