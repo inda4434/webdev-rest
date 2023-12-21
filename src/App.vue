@@ -258,7 +258,7 @@ function deleteCrimeMarker(markerId) {
 }
 
 const handleCrimeSelection = (crime) => {
-    const address = crime.block.split(" ").map((word, index) => index === 0 ? word.replace(/X/g, '0'): word).join(" ");
+    const address = crime.block.split(" ").map((word, index) => index === 0 ? word.replace(/X/g, '0'): word).join(" ") + " Saint Paul, Minnesota";
     console.log(address);
 
     getCoordinatesForAddress(address)
