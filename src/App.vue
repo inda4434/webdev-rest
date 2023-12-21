@@ -487,7 +487,7 @@ function updateFilter(){
     })
     .then((data) => {
         console.log(data);
-        crimes.value = data;
+        crimes.value = data.slice(1, data.length-1);
     })
     .catch((err) =>{
         console.log(err)
