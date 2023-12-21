@@ -258,7 +258,7 @@ function deleteCrimeMarker(markerId) {
 }
 
 const handleCrimeSelection = (crime) => {
-    const address = crime.block.replace(/(\d+)X/, '$10');
+    const address = crime.block.split(" ").map((word, index) => index === 0 ? word.replace(/X/g, '0'): word).join(" ");
     console.log(address);
 
     getCoordinatesForAddress(address)
