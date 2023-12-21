@@ -553,7 +553,7 @@ function newIncidentFunc(){
         <button id="go-button" class="button" type="button" @click="updateMapLocation">Go</button>
     </dialog>
 -->
-    <div id="location-dialog" class="container" hidden open>
+    <div id="location-dialog" class="container auto" hidden open>
         <label for="location-dialog" style="font-weight: 750;">Go to a location on map:</label>
         <input id="location" class="dialog-input" type="text" v-model="location_input" placeholder="Enter location"/>
         <button id="go-button" class="button" type="button" @click="updateMapLocation">Go</button>
@@ -779,10 +779,11 @@ function newIncidentFunc(){
 
 .container {
     position: relative;
+    background-color: rgb(166, 240, 249);
 }
 
 #location-dialog {
-    position: absolute;
+    align-items: center;
     bottom: 20%;
     left: 1rem;
     background-color: white;
