@@ -174,7 +174,8 @@ function initializeCrimes() {
     fetch(crime_url.value + '/incidents')
         .then(response => response.json())
         .then(data => {
-            crimes.value = data;
+            //crimes.value = data;
+            crimes.value = data.slice(1, data.length-1);
             console.log(crimes.value);
 
             const fetchNeighborhoodPromises = crimes.value.map(crime => fetchNeighborhoodNameForCrime(crime));
@@ -338,7 +339,8 @@ const getCoordinatesForAddress = (address) => {
 };
 
 function deleteCrime(caseNumber) {
-    fetch(`${crime_url.value}/remove-incident?$`, {
+    const apiUrl = 'http://localhost:8000/remove-incident';
+    fetch(apiUrl, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
