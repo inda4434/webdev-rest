@@ -10,6 +10,13 @@
     <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <ul class="menu">
+                <li><a href="#" onclick="navigateToVueApp()">App Page</a></li>
+            </ul>
+        </div>
+    </div>
     <h3 class="cell text-center heading">About the Project</h3>
     <div class="grid-x grid-padding-x" style="padding-left: 2rem; padding-right: 2rem;">
         <div class="cell small-12 medium-12 large-12">
@@ -18,7 +25,7 @@
         <div class="cell small-10 medium-4 large-4">
         <h5 class="cell text-center">Gratzia Indacochea</h5>
         <div class="grid-x">
-            <img src="img/gratzia.jpg", alt="Gratzia" style="margin: auto;">
+            <img src="img/gratzia.jpg", alt="Gratzia" style="margin: auto; border-radius: 1.3rem;">
             <div class="cell">
                 Hey! I'm Maria Gratzia Indacochea Rosado, Gratzia for short, and I'm an international student from Ecuador. Currently, I'm a senior at the University of St. Thomas and I'm majoring in computer science and math.
                 I have three cats, and a fun fact about me is that for this project (for some sick and twisted reason) vue was not running for me. Fun, right? 
@@ -29,7 +36,7 @@
         <div class="cell small-12 medium-4 large-4">
         <h5 class="cell text-center">Chandler Carlin</h5>
         <div class="grid-x"></div>
-            <img src="img/chandler_picture.jpg", alt="chandler carlin">
+            <img src="img/chandler_picture.jpg", alt="chandler carlin" style="margin: auto; border-radius: 1.3rem;">
             <div class="cell">
                 Hey, my name is Chandler Carlin; I'm a senior at the University of St. Thomas. I'm majoring in computer science and minoring in mathematics.
                 I'm currently in the process of applying to PhD programs around the country, but only time will tell how far those get. 
@@ -37,14 +44,14 @@
         </div>
         <div class="cell small-12 medium-4 large-4">
             <h5 class="cell text-center">Bifuh Ngongalah</h5>
-            <img src="img/me.jpeg", alt="Image of Bifuh Ngongalah" style="margin: auto;">
+            <img src="img/me.jpeg", alt="Image of Bifuh Ngongalah" style="margin: auto; border-radius: 1.3rem;">
             <div class="cell">
                 Hi! I'm Bifuh Ngongalah, a junior Computer Science major at the University of St. Thomas. I'm looking forward to conducting research
                 next semester and having my second internship in the summer. Outside of software development, I enjoy reading, going to concerts,
                 thrifting, and trying new restaurants.
             </div>
         </div>
-        <div class="cell small-12 medium-12 large-12">
+        <div class="cell small-12 medium-12 large-12" style="margin-top: 2rem;">
             <h4 class="heading">Project Overview and Tools/Frameworks Used</h4>
             <p>This project constitutes a single-page application focused on crimes in St. Paul, Minnesota. The initial 
                 phase involved constructing a RESTful server that seamlessly interacted with the St. Paul crimes database. 
@@ -59,12 +66,13 @@
                 presentation of HTML elements.
             </p>
 
-            <h4 class="heading">Application Video Demo</h4>
+            <h4 class="heading" style="margin-top: 2rem;">Application Video Demo</h4>
+            <p>Here is a short demo of how our application works.</p>
             <video width="640" height="360" controls>
                 <source src="video/demo.mp4" type="video/mp4">
             </video>
 
-            <h4 class="heading">Six interesting findings</h4>
+            <h4 class="heading" style="margin-top: 2rem;">Six interesting findings</h4>
                 <ul>
                     <li>The police department employs two different codes, 411 and 412, to categorize the exact same incident type, namely "Aggravated Assault, Domestic." We wonder what the difference is.</li>
                     <img src="img/funfact1.jpg" alt="screenshot of crime codes" style="width:30rem; height:18rem;">
@@ -98,6 +106,10 @@
     <script src="./js/vendor/foundation.js"></script>
     <script type="application/javascript">
         $(document).foundation();
+
+        function navigateToVueApp() {
+
+        }
     </script>
 </body>
 </html>

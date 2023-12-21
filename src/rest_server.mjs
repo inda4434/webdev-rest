@@ -10,7 +10,7 @@ const db_filename = path.join(__dirname, '../db', 'stpaul_crime.sqlite3');
 
 console.log(db_filename);
 
-const port = 8001;
+const port = 8000;
 
 let app = express();
 app.use(express.json());
@@ -97,16 +97,16 @@ app.get('/incidents', (req, res) => {
 
     // add start_date - first date to include in results
     if (req.query.hasOwnProperty('start_date')) {
-        query += ' WHERE date_time >= "' + req.query.start_date +'" ';
+        query += ' WHERE SUBSTRING(date_time, 1, 10) >= "' + req.query.start_date +'" ';
         c.push('1');
     }
     // add end_date - last date to include in results
     if (req.query.hasOwnProperty('end_date')) {
         if (c.length === 0) {
-            query += ' WHERE date_time <= "' + req.query.end_date +'"';
+            query += ' WHERE SUBSTRING(date_time, 1, 10) <= "' + req.query.end_date +'"';
         } 
         else {
-            query += ' AND date_time <= "' + req.query.end_date +'"';
+            query += ' AND SUBSTRING(date_time, 1, 10) <= "' + req.query.end_date +'"';
         }
         c.push('1');
     }

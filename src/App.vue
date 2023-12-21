@@ -475,6 +475,9 @@ function updateFilter(){
     } else if (total_parameters.includes('&&')){
         total_parameters = total_parameters.replace('&&', '&');
     }
+    if (total_parameters[total_parameters.length-1]=='&'){
+        total_parameters = total_parameters.substring(0, total_parameters.length-1);
+    }
     if (total_parameters[0]=='&'){
         total_parameters = total_parameters.substring(1);
     }
