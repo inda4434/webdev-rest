@@ -3,48 +3,86 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>About Us</title>
+    <title>About the Project</title>
     <!-- Foundation CSS -->
     <link rel="stylesheet" href="css/foundation.css">
     <!-- Custom Style -->
     <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
-    <div class="grid-container">
-        <h2 class="cell text-center">Bifuh Ngongalah</h2>
-        <div class="grid-x grid-padding-x">
+    <h3 class="cell text-center heading">About the Project</h3>
+    <div class="grid-x grid-padding-x" style="padding-left: 2rem; padding-right: 2rem;">
+        <div class="cell small-12 medium-12 large-12">
+            <h4 class="heading">Contributors</h4>
         </div>
-        <h2 class="cell text-center">Gratzia Indacochea</h2>
-        <div class="grid-x grid-padding-x">
-            <img class="cell large-7 small-7" src="img/gratzia.jpg", alt="Gratzia" style="margin: auto;">
+        <div class="cell small-10 medium-4 large-4">
+        <h5 class="cell text-center">Gratzia Indacochea</h5>
+        <div class="grid-x">
+            <img src="img/gratzia.jpg", alt="Gratzia" style="margin: auto;">
             <div class="cell">
                 Hey! I'm Maria Gratzia Indacochea Rosado, Gratzia for short, and I'm an international student from Ecuador. Currently, I'm a senior at the University of St. Thomas and I'm majoring in computer science and math.
-                I have three cats, and a fun fact about me is that for this project (for some sick and twisted reason) vue was not running for me. fun, right? 
+                I have three cats, and a fun fact about me is that for this project (for some sick and twisted reason) vue was not running for me. Fun, right? 
             </div>
-            <img class="cell large-7 small-7" src="img/omgihv.jpg", alt="omgihv" style="margin: auto;">
+            <img id="error" class="cell large-12 small-12" src="img/omgihv.jpg", alt="omgihv" style="margin: auto;">
         </div>
-        <h2 class="cell text-center">Chandler Carlin</h2>
+        </div>
+        <div class="cell small-12 medium-4 large-4">
+        <h5 class="cell text-center">Chandler Carlin</h5>
         <div class="grid-x"></div>
-            <img class="cell large-up-1 small-12" src="img/chandler_picture.jpg", alt="chandler carlin">
+            <img src="img/chandler_picture.jpg", alt="chandler carlin">
             <div class="cell">
                 Hey, my name is Chandler Carlin; I'm a senior at the University of St. Thomas. I'm majoring in computer science and minoring in mathematics.
                 I'm currently in the process of applying to PhD programs around the country, but only time will tell how far those get. 
             </div>
-        <div class="grid-x grid-padding-x"></div>
-    </div>
+        </div>
+        <div class="cell small-12 medium-4 large-4">
+            <h5 class="cell text-center">Bifuh Ngongalah</h5>
+            <img src="img/me.jpeg", alt="Image of Bifuh Ngongalah" style="margin: auto;">
+            <div class="cell">
+                Hi! I'm Bifuh Ngongalah, a junior Computer Science major at the University of St. Thomas. I'm looking forward to conducting research
+                next semester and having my second internship in the summer. Outside of software development, I enjoy reading, going to concerts,
+                thrifting, and trying new restaurants.
+            </div>
+        </div>
+        <div class="cell small-12 medium-12 large-12">
+            <h4 class="heading">Project Overview and Tools/Frameworks Used</h4>
+            <p>This project constitutes a single-page application focused on crimes in St. Paul, Minnesota. The initial 
+                phase involved constructing a RESTful server that seamlessly interacted with the St. Paul crimes database. 
+                To achieve this, we utilized <span>JavaScript</span>, <span>Node.js</span>, <span>Express.js</span>, and implemented straightforward <span>SQL</span> 
+                queries.
+            </p>
+            <p>
+                Next, the development shifted towards the creation of the web application itself, employing <span>JavaScript</span> 
+                and <span>Vue.js</span>. Data retrieval was facilitated through three APIs: the custom API developed earlier, the <span>Leaflet</span> 
+                API for mapping functionalities, and the <span>Nominatim</span> API for geocoding purposes. The visual aesthetics were 
+                enhanced using the <span>Foundation CSS</span> framework in conjunction with our tailored <span>CSS</span> styling to refine the 
+                presentation of HTML elements.
+            </p>
 
-    <div class="grid-container">
-        <div class="grid-x grid-padding-x">
-            <div class="cell small-12 large-12 medium-12">
-                <h2>Six interesting findings</h2>
+            <h4 class="heading">Six interesting findings</h4>
                 <ul>
-                    <li>The police department have two different codes, 411 and 412, for exact same incident type ("Aggravated Assault, Domestic"). I wonder what is the difference.</li>
+                    <li>The police department employs two different codes, 411 and 412, to categorize the exact same incident type, namely "Aggravated Assault, Domestic." We wonder what the difference is.</li>
+                    <li>Capitol River was the neighborhood with the highest crime count (based off of the first 1000 crimes in the database).</li>
                 </ul>
             </div>
 
         </div>
-
     </div>
+    </div>
+
+    <style>
+        .heading {
+            font-weight: bold;
+        }
+
+        span {
+            font-style: italic;
+        }
+
+        #error {
+            height: 8rem;
+        }
+    </style>
 
     <!-- Foundation CSS Framework: include before closing <body> tag -->
     <script src="./js/vendor/jquery.js"></script>

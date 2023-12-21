@@ -698,7 +698,7 @@ function newIncidentFunc(){
                     <!--case_number-->
                     <div class="cell small-12 large-6">
                         <label for="case_number">Case Number: </label>
-                        <input type="text" placeholder="Ex: 20231219" name="case_number" id="case_number" v-model="newIncident.case_number" required/>
+                        <input type="text" placeholder="Ex: 19245016" name="case_number" id="case_number" v-model="newIncident.case_number" required/>
                     </div>
                     <!--date-->
                     <div class="cell small-12 large-6">
