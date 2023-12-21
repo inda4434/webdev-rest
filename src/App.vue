@@ -693,7 +693,7 @@ function newIncidentFunc(){
         <div class="grid-x grid-padding-x">
             <h5 class="cell small-12 large-12" style="font-weight: bold; font-size: medium; margin-top: 1rem;">Submit New Incident</h5>
             <div class="cell small-12 large-6">
-                <form id="new-incident" action="/new-incident" method="PUT" @submit.prevent="newIncident">
+                <form id="new-incident" action="/new-incident" method="PUT">
                     <!--case_number-->
                     <div class="cell small-12 large-6">
                         <label for="case_number">Case Number: </label>
@@ -736,7 +736,7 @@ function newIncidentFunc(){
                     </div>
                     <!--submit-->
                     <div class="cell small-12 large-6">
-                        <button id="sub_new_inc" type="submit">Submit</button>
+                        <button id="sub_new_inc" type="submit" @click="newIncidentFunc">Submit</button>
                     </div>
                 </form>
             </div>
